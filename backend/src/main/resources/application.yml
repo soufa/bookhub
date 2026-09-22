@@ -3,7 +3,7 @@ spring:
     name: bookhub-backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/bookhub
+    url: jdbc:postgresql://localhost:5433/bookhub
     username: ${POSTGRES_USER:bookhub}
     password: ${POSTGRES_PASSWORD:bookhub}
     driver-class-name: org.postgresql.Driver
