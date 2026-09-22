@@ -1,0 +1,29 @@
+﻿services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bookhub-postgres
+    environment:
+      POSTGRES_DB: bookhub
+      POSTGRES_USER: bookhub
+      POSTGRES_PASSWORD: bookhub
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookhub"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer:latest
+    container_name: bookhub-adminer
+    ports:
+      - "8090:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
