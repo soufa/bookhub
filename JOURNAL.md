@@ -6,22 +6,25 @@
 - PostgreSQL 16 en Docker (port 5433)
 - Flyway migration V1 exécutée automatiquement
 - Endpoint `/api/hello` fonctionnel
-- Projet poussé sur GitHub
+- Repo GitHub public + CI GitHub Actions vert
+- 5 Q/R entretien documentées
 
 ### ❌ Bloqué (résolu)
-- Erreur d'authentification PostgreSQL → résolue en supprimant le volume obsolète
-- Conflit port 5432 avec PostgreSQL natif Windows → résolu avec port 5433
-- Conflit Spring Security + Actuator → résolu en excluant les 2 auto-configs
+- Erreur d'authentification PostgreSQL → volume obsolète supprimé
+- Conflit port 5432 avec PostgreSQL natif Windows → port 5433
+- Conflit Spring Security + Actuator → exclusion des auto-configs
 
 ### 💡 Appris
-- **Docker volume persistance** : `POSTGRES_PASSWORD` n'est utilisé qu'à la 1ère init du volume
-- **`docker-compose down -v`** ne supprime pas toujours les volumes en usage
-- **Spring Security auto-config** est activée dès que le starter est dans le pom.xml
-- **Actuator + Security** sont couplés (d'où l'erreur `HttpSecurity`)
-- **Port mapping Docker** : `5433:5432` = 5433 côté Windows, 5432 dans le container
+- Docker volume persistence : `POSTGRES_PASSWORD` n'est utilisé qu'à la 1ère init
+- `docker-compose down -v` ne supprime pas toujours les volumes en usage
+- Spring Security auto-config s'active dès que le starter est dans le pom.xml
+- Actuator + Security sont couplés (erreur HttpSecurity)
+- Port mapping Docker : `5433:5432` = 5433 côté Windows, 5432 dans le container
+- GitHub Actions : setup-java avec cache Maven = CI vert
+- Badge CI dans le README = signal pro pour les recruteurs
 
-### 🎯 Demain (J2)
+### 🎯 Demain (J2 — 23/09)
 - Cours Buchalka : Records + sealed + pattern matching (2h)
-- Créer `Isbn.java` et `Money.java` dans `shared/domain/`
-- Écrire 8 Q/R entretien (Java Records + Optional)
-- Commit GitHub avec 1ᵉʳ code Java moderne
+- Créer `Isbn.java` et `Money.java` dans `shared/domain/` (2h)
+- Écrire 8 nouvelles Q/R entretien (Records avancés + sealed)
+- Commit GitHub avec le 1er code Java moderne
