@@ -175,7 +175,7 @@ public Money {
 
 
 ### Q 15. Différence entre List.of() et Arrays.asList() ?
-** R courte **
+**R courte** :
 List.of() est immuable (refuse null). Arrays.asList() est de taille fixe mais permet set(), et accepte null.
 
 **Exemple**:
@@ -187,7 +187,7 @@ List<String> fixed = Arrays.asList("a", "b");   // set() OK, add() → Unsupport
  List.of() lève NullPointerException si un élément est null. Arrays.asList() accepte les nulls.
  
  ### Q 16  Quand utiliser List.copyOf() ? ?
-** R courte **
+**R courte** :
 R courte : Pour faire une copie défensive d'une collection, en garantissant l'immuabilité. Crée une nouvelle liste, refuse les nulls.
 **Exemple**
 public record Team(String name, List<String> members) {
@@ -200,14 +200,14 @@ public record Team(String name, List<String> members) {
  
  
  ###  Q 17. Différence entre String.replace et String.replaceAll ?
-** R courte **
+**R courte** :
  replace(CharSequence, CharSequence) = remplacement littéral. replaceAll(String regex, String replacement) = regex.
  **Exemple**
  "a.b.c".replace(".", "-");      // "a-b-c"  (littéral)
 "a.b.c".replaceAll(".", "-");   // "-----"  (regex : . = n'importe quel caractère)
 
 ### Q 18. BigDecimal vs double — pourquoi BigDecimal pour l'argent ?
-** R courte **
+**R courte** :
 double a une précision binaire limitée (0.1 + 0.2 ≠ 0.3). BigDecimal a une précision arbitraire et un contrôle sur l'échelle (scale).
  **Exemple**
  System.out.println(0.1 + 0.2);                  // 0.30000000000000004
@@ -219,7 +219,7 @@ toujours construire un BigDecimal depuis une String, jamais depuis un double :
 new BigDecimal("0.1");    // ✅ 0.1
 
 ### Q 19. Currency.getInstance() — que se passe-t-il si le code est invalide ?
-** R courte **
+**R courte** :
 Lance IllegalArgumentException si le code ISO 4217 n'existe pas.
 **Exemple**Currency.getInstance("EUR");   // OK
 Currency.getInstance("XXX");   // IllegalArgumentException
@@ -227,21 +227,21 @@ Currency.getInstance("eu");    // IllegalArgumentException (case-sensitive)
 **Piege**
 c'est un point d'entrée sensible. Valider les codes devise côté API (enum ou liste blanche).
 ### Q 20. Record avec BigDecimal — piège equals sur scale
-** R courte **
+**R courte** :
 BigDecimal.equals() compare valeur ET scale. new BigDecimal("1.0").equals(new BigDecimal("1.00")) est false !
 ** Exemple **
 new BigDecimal("1.0").equals(new BigDecimal("1.00"));        // false
 new BigDecimal("1.0").compareTo(new BigDecimal("1.00")) == 0; // true
-**Piege **
+**Piege**
 un record Money(amount, currency) avec BigDecimal peut avoir un equals surprenant.
  Solution : normaliser le scale dans le constructeur (amount.setScale(2, RoundingMode.HALF_UP)), ou utiliser compareTo
 ### Q 21. Pourquoi Objects.hash() plutôt que hashCode() manuel ?
-** R courte **
+**R courte** :
 Objects.hash(a, b, c) combine plusieurs valeurs en un hash unique, sans écrire à la main les 31 * result + ....
 **Exemple **
 @Override
 public int hashCode() {
     return Objects.hash(email, name);   // ✅ propre
 }
-** Piege **
+**Piege**
 depuis Java 16+, les record génèrent automatiquement equals/hashCode. Ne les redéfinir que si nécessaire
