@@ -159,3 +159,29 @@ Alternative : utiliser un record pour les DTO, une classe pour les entités.
 
 Piège : depuis Hibernate 6.2, on peut utiliser des records dans les projections JPQL, mais pas comme entités.
 }
+
+## Java — Records (suite) & divers
+
+### Q 14. Quand utiliser `Objects.requireNonNull` ?
+
+**R courte** : En début de constructeur ou de méthode, pour valider qu'un paramètre n'est pas null.
+ Lance `NullPointerException` immédiatement, plutôt qu'un NPE plus tard à un endroit imprévisible.
+
+**Exemple** :
+public Money {
+    Objects.requireNonNull(amount, "Amount required");
+    Objects.requireNonNull(currency, "Currency required");
+}
+
+
+### Q 15. Différence entre List.of() et Arrays.asList() ?
+** R courte **
+List.of() est immuable (refuse null). Arrays.asList() est de taille fixe mais permet set(), et accepte null.
+
+**Exemple**:
+
+**java**
+List<String> immutable = List.of("a", "b");     // set() → UnsupportedOperationException
+List<String> fixed = Arrays.asList("a", "b");   // set() OK, add() → UnsupportedOperationException
+**Piège** 
+ List.of() lève NullPointerException si un élément est null. Arrays.asList() accepte les nulls.
