@@ -37,3 +37,35 @@ Hamcrest
 JSONassert
 Spring Test
 Vous n'avez jamais besoin d'ajouter JUnit manuellement. Si vous voyez une recommandation qui suggère de l'ajouter, elle est fausse.
+
+## 2026-09-23 (mercredi) — J2
+
+### ✅ Fait
+- `Isbn.java` : record avec validation + normalisation (retrait tirets/espaces)
+- `IsbnTest.java` : 5 tests JUnit 5 (valide 10, valide 13, tirets, invalide, null)
+- `Money.java` : record avec `BigDecimal` + `Currency` + validation scale ≤ 2
+- `MoneyTest.java` : 5 tests (from strings, add, devise différente, scale, null)
+- 8 nouvelles Q/R entretien (Q14 → Q21) — total **21**
+- **10 tests** passent en local et dans le CI
+
+### ❌ Bloqué (résolu)
+- JUnit 4 imports dans `IsbnTest` → migré vers JUnit 5
+- Typo "requiered" dans `Isbn` → corrigée
+- `MoneyTest` pas détecté au début → était dans `src/main/java` au lieu de `src/test/java`
+
+### 💡 Appris
+- `spring-boot-starter-test` inclut JUnit 5 — jamais ajouter JUnit manuellement
+- Les tests vont dans `src/test/java`, jamais `src/main/java`
+- JUnit 5 : `org.junit.jupiter.api.Test`, **jamais** `org.junit.Test`
+- `Objects.requireNonNull(value, "message")` en compact constructor
+- Compact constructor : on peut réassigner le paramètre pour normaliser
+- `BigDecimal.equals()` compare valeur ET scale (piège classique)
+- `List.of()` refuse null, `Arrays.asList()` accepte null
+- CI Maven avec cache GitHub Actions : 5s build + 14s setup = 19s
+
+### 🎯 Demain (J3)
+- `BookStatus` enum avec logique
+- `BookDto` record (préparation S2)
+- Sealed interface pour `Notification` (Email, SMS)
+- Pattern matching `instanceof` appliqué dans le code
+- 8 Q/R supplémentaires (Q22 → Q29)
