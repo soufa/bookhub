@@ -28,3 +28,12 @@
 - Créer `Isbn.java` et `Money.java` dans `shared/domain/` (2h)
 - Écrire 8 nouvelles Q/R entretien (Records avancés + sealed)
 - Commit GitHub avec le 1er code Java moderne
+### Note sur spring-boot-starter-test
+Ce starter inclut automatiquement :
+JUnit 5 (Jupiter)
+Mockito
+AssertJ
+Hamcrest
+JSONassert
+Spring Test
+Vous n'avez jamais besoin d'ajouter JUnit manuellement. Si vous voyez une recommandation qui suggère de l'ajouter, elle est fausse.
