@@ -10,14 +10,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class MoneyTest {
 
     @Test
-    void should_create_from_strings() {
+    public void should_create_from_strings() {
         Money m = Money.of("19.99", "EUR");
         assertEquals(new BigDecimal("19.99"), m.amount());
         assertEquals(Currency.getInstance("EUR"), m.currency());
     }
 
     @Test
-    void should_add_same_currency() {
+    public void should_add_same_currency() {
         Money a = Money.of("10.00", "EUR");
         Money b = Money.of("5.50", "EUR");
         Money sum = a.add(b);
@@ -25,20 +25,20 @@ class MoneyTest {
     }
 
     @Test
-    void should_reject_different_currencies() {
+    public void should_reject_different_currencies() {
         Money eur = Money.of("10.00", "EUR");
         Money usd = Money.of("10.00", "USD");
         assertThrows(IllegalArgumentException.class, () -> eur.add(usd));
     }
 
     @Test
-    void should_reject_more_than_2_decimals() {
+    public void should_reject_more_than_2_decimals() {
         assertThrows(IllegalArgumentException.class,
                 () -> new Money(new BigDecimal("10.123"), Currency.getInstance("EUR")));
     }
 
     @Test
-    void should_reject_null() {
+    public void should_reject_null() {
         assertThrows(NullPointerException.class,
                 () -> new Money(null, Currency.getInstance("EUR")));
     }
