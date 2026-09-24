@@ -249,3 +249,94 @@ public int hashCode() {
 }
 **Piege**
 depuis Java 16+, les record génèrent automatiquement equals/hashCode. Ne les redéfinir que si nécessaire
+
+---
+
+## Java — Enums & sealed
+
+### Q 22. Qu'est-ce qu'un enum Java ?
+
+**R courte** : Type spécial qui représente un ensemble fini et fixe de constantes. Ce sont des classes à part entière : elles peuvent avoir des champs, des constructeurs, des méthodes.
+
+**Exemple** :
+***java***
+public enum BookStatus {
+    AVAILABLE("Available"),
+    BORROWED("Currently borrowed");
+
+    private final String description;
+    BookStatus(String description) { this.description = description; }
+    public String description() { return description; }
+}
+***PIEGE***
+ le constructeur d'un enum est implicitement privé. On ne peut pas instancier un enum avec new.
+
+###Q 23. Différence entre enum et constantes static final ?
+**R courte** : Enum = type à part entière, sûr à la compilation, itérable, avec méthodes et champs. static final String = juste une valeur, aucune garantie de validité.
+
+**Piege** : un enum peut être utilisé dans un switch (exhaustivité vérifiée). Les constantes String ne le permettent pas.
+
+### Q 24. Qu'est-ce qu'une sealed interface ?
+**R courte** : Interface qui restreint les types qui peuvent l'implémenter. Introduite en Java 17 (final). Hiérarchie fermée, exhaustivité au compilateur.
+
+**Exemple** :
+
+java
+public sealed interface Shape permits Circle, Rectangle {}
+
+**Piège** : les sous-types doivent être dans le même module ou le même package (si module-less).
+
+### Q 25. Différence entre sealed, final, non-sealed ?
+**R courte** :
+
+final : aucune extension possible
+
+sealed : extension limitée à une liste explicite (permits)
+
+non-sealed : extension libre (désactive le sceau pour un sous-type)
+
+**Piège** : un sous-type d'une classe sealed doit être déclaré final, sealed ou non-sealed
+
+### Q 26. Pourquoi utiliser un record comme DTO ?
+**R courte** : Immuable, concis, equals/hashCode automatiques, idéal pour transporter des données entre couches (contrôleur ↔ service ↔ client).
+
+**Exemple** :
+
+java
+public record BookDto(Long id, String title) {}
+
+**Piège** : un record n'est pas adapté aux entités JPA (Hibernate a besoin de proxyfié, et un record est final).
+
+###Q 27. Où valider : DTO ou entité ?
+
+**R courte** : Les deux, mais différemment. Le DTO valide la forme (champs requis, format). L'entité valide les invariants métier (unicité, cohérence).
+
+**Piège** : ne pas dupliquer la même validation aux deux endroits. Le DTO assure que l'input est propre, l'entité assure l'intégrité.
+
+
+### Q 28. Qu'est-ce que le pattern matching instanceof ?
+
+**R courte** : Java 16+. Permet de tester et caster en une seule expression, avec une variable scopée au bloc où le test est vrai.
+
+**Exemple** :
+
+java
+if (notification instanceof EmailNotification email) {
+    System.out.println(email.email());
+}
+**Piège** : la variable email n'existe que dans la branche où le test est vrai (flow scoping).
+
+###Q 29. Switch expression sur enum ?
+
+**R courte** : Depuis Java 14, un switch peut être une expression qui renvoie une valeur. Sur un enum, le compilateur vérifie l'exhaustivité (pas besoin de default).
+
+**Exemple** :
+
+java
+String label = switch (status) {
+    case AVAILABLE -> "Dispo";
+    case BORROWED -> "Emprunté";
+    case RESERVED -> "Réservé";
+    case LOST, MAINTENANCE -> "Indisponible";
+};
+**Piège** : -> (arrow) remplace : et break. Pas de fall-through possible.
