@@ -340,3 +340,72 @@ String label = switch (status) {
     case LOST, MAINTENANCE -> "Indisponible";
 };
 **Piège** : -> (arrow) remplace : et break. Pas de fall-through possible.
+
+
+---
+
+## Java — Collections
+
+### Q30. Différence entre `ArrayList` et `LinkedList` ?
+
+**R courte** : `ArrayList` = tableau dynamique, accès index O(1), insertion fin O(1) amorti. `LinkedList` = liste doublement chaînée, insertion milieu O(1) si nœud connu, accès O(n).
+
+**Piège** : dans 95 % des cas, `ArrayList` est plus rapide (cache-friendly). Ne pas choisir `LinkedList` sur la seule théorie.
+
+**Vécu** : (à remplir)
+
+---
+
+### Q31. Différence entre `HashMap` et `TreeMap` ?
+
+**R courte** : `HashMap` = O(1) amorti, pas d'ordre. `TreeMap` = O(log n), clés triées, navigation (`floorKey`, `ceilingKey`).
+
+**Piège** : `TreeMap` exige que les clés soient `Comparable` ou un `Comparator` fourni. Un `compareTo` incohérent avec `equals` produit des comportements étranges.
+
+**Vécu** : (à remplir)
+
+---
+
+### Q32. Pourquoi `EnumMap` plutôt que `HashMap<MyEnum, V>` ?
+
+**R courte** : `EnumMap` utilise un tableau indexé par `ordinal`. Plus compact, plus rapide, ordre de déclaration naturel.
+
+**Piège** : toujours préférer `EnumMap` quand les clés sont une enum. Pour les sets, utiliser `EnumSet`.
+
+**Vécu** : (à remplir)
+
+---
+
+### Q33. Qu'est-ce que `ConcurrentModificationException` ?
+
+**R courte** : Levée par les itérateurs fail-fast (`ArrayList`, `HashMap`) quand la collection est modifiée pendant l'itération.
+
+**Exemple** :
+java
+for (String s : list) if (s.isEmpty()) list.remove(s); // ❌ CME
+list.removeIf(String::isEmpty);                          // ✅
+
+
+### Q34. Différence entre fail-fast et fail-safe ?
+**R courte** : fail-fast (ArrayList) = détecte la modification, lève CME. fail-safe (CopyOnWriteArrayList) = snapshot, pas d'exception, modifications invisibles.
+
+**Piège** : CopyOnWriteArrayList copie tout à chaque écriture → inadapté aux écritures fréquentes.
+
+
+### Q35. Qu'est-ce que PriorityQueue ?
+**R courte** : Tas binaire. offer() et poll() en O(log n). L'itérateur ne garantit pas l'ordre du tas.
+
+**Exemple** :
+PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.reverseOrder());
+Piège : peek() renvoie le plus petit (ou plus grand selon le comparator), mais forEach() renvoie dans un ordre arbitraire.
+
+### Q36. Différence entre Stack et ArrayDeque ?
+**R courte** : Stack étend Vector (synchronisé, legacy). ArrayDeque est plus rapide, non synchronisé, API Deque claire (push/pop/offer/poll aux deux bouts).
+
+**Piège** : Stack est un anti-pattern. Toujours préférer ArrayDeque.
+
+
+### Q37. Comment rendre une collection immuable ?
+**R courte** : List.copyOf(), Set.copyOf(), Map.copyOf() (Java 10+) → copie défensive + immuable. Refuse null.
+
+**Piège** : Collections.unmodifiableList() est une vue — si la liste source change, la vue change aussi. Pas une copie.
