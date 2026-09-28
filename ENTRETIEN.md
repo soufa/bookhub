@@ -409,3 +409,84 @@ Piège : peek() renvoie le plus petit (ou plus grand selon le comparator), mais 
 **R courte** : List.copyOf(), Set.copyOf(), Map.copyOf() (Java 10+) → copie défensive + immuable. Refuse null.
 
 **Piège** : Collections.unmodifiableList() est une vue — si la liste source change, la vue change aussi. Pas une copie.
+
+
+## Java — Streams & Lambda
+
+### Q38. Différence entre `map` et `flatMap` ?
+
+**R courte** : `map` transforme 1 → 1. `flatMap` transforme 1 → N (aplatit un `Stream<Stream<T>>` en `Stream<T>`).
+
+**Exemple** :
+// map → Stream<Stream<Item>>
+orders.stream().map(o -> o.items().stream());
+
+// flatMap → Stream<Item>
+orders.stream().flatMap(o -> o.items().stream());
+Piège : si vous écrivez map et obtenez un Stream<Stream<...>>, c'est flatMap qu'il fallait utiliser.
+
+
+### Q39. reduce vs collect — quand utiliser l'un ou l'autre ?
+**R courte** : reduce pour des valeurs immuables (somme, min, max). collect pour accumuler dans une structure mutable (List, Map, StringBuilder).
+
+**Piège** : reduce avec un accumulateur mutable partagé = race condition en parallèle. Utiliser collect avec un supplier frais par partition.
+
+### Q40. findFirst vs findAny ?
+**R courte** : findFirst = déterministe, respecte l'ordre d'encounter. findAny = autorise une optimisation en parallèle, résultat non déterministe.
+
+**Piège** : sur un stream parallèle ordonné, findFirst coûte cher. Préférer findAny quand l'ordre n'importe pas.
+
+### Q41. Pourquoi les Streams sont-ils lazy ?
+** R courte** : Les opérations intermédiaires ne s'exécutent pas tant qu'aucune opération terminale n'est appelée. Permet les optimisations (short-circuit, fusion d'opérations).
+
+**Exemple** :
+
+java
+Stream.of(1, 2, 3).filter(x -> { System.out.println(x); return true; });
+// Rien ne s'affiche : pas d'opération terminale
+**Piège** : oublier l'opération terminale = pipeline jamais exécuté, aucune erreur.
+
+
+### Q42. Collectors.toMap — pièges ?
+**R courte** : Lève IllegalStateException si clé dupliquée (sans merge function). Lève NullPointerException si valeur null.
+
+**Exemple** :
+
+java
+.collect(Collectors.toMap(
+    Book::isbn,
+    Book::title,
+    (a, b) -> a    // merge : garder le premier
+));
+**Piège** : toujours fournir une merge function si les clés peuvent être dupliquées. toMap refuse null en valeur.
+
+###Q43. groupingBy avec downstream — à quoi ça sert ?
+**R courte** : Le 2ᵉ argument est un collector appliqué à chaque groupe. Permet de compter, moyenner, mapper à l'intérieur de chaque groupe.
+
+**Exemple** :
+
+java
+Map<String, Long> countByAuthor = books.stream()
+    .collect(Collectors.groupingBy(
+        Book::author,
+        Collectors.counting()
+    ));
+**Piège** : par défaut, groupingBy retourne List<T>. Utiliser un downstream (counting(), mapping(), averagingInt()) pour transformer.
+
+### Q44. Pourquoi éviter les effets de bord dans map/filter ?
+**R courte** : Les opérations intermédiaires doivent être pures. Sinon → résultats non déterministes en parallèle, incompatibilité avec les optimisations du framework.
+
+**Exemple** :
+
+java
+// ❌ Anti-pattern
+stream.map(x -> { counter.incrementAndGet(); return x * 2; });
+
+// ✅ Utiliser un collector ou compter en sortie
+long count = stream.count();
+**Piège** : peek est prévu pour le debug, pas pour la logique métier
+
+### Q45. Quand utiliser parallelStream ?
+**R courte** : CPU-bound, gros volumes (milliers+), pas d'effet de bord, opérations associatives. Sinon, l'overhead dépasse le gain.
+
+**Piège** : parallelStream sur I/O-bound ou petits volumes = plus lent que séquentiel. Toujours mesurer avant.**
