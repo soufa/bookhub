@@ -561,7 +561,7 @@ private String message;
 **Piège** : syntaxe ${clé:valeur_par_défaut}. Sans valeur par défaut, si la clé est absente → IllegalArgumentException au démarrage.
 
 
-###Q51. Qu'est-ce que @PostConstruct / @PreDestroy ?
+### Q51. Qu'est-ce que @PostConstruct / @PreDestroy ?
 **R courte** :
 
 @PostConstruct : appelé après l'injection des dépendances, avant que le bean soit utilisé
@@ -579,7 +579,7 @@ Utile pour : ouvrir/fermer des ressources, initialiser des caches, logger le dé
 
 **Piège** : un singleton ne doit jamais avoir d'état mutable partagé. Sinon → problèmes de concurrence.
 
-###Q53. Qu'est-ce que ApplicationContext ?
+### Q53. Qu'est-ce que ApplicationContext ?
 **R courte** : Le conteneur IoC de Spring. Il gère le cycle de vie des beans, l'injection des dépendances, la résolution des propriétés.
 
 **Exemple** :
