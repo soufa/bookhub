@@ -4,7 +4,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationDispatcher {
-
+    /**
+     * pattern matching
+     * @param notification
+     * @return
+     *
+     * final pas dheritage , sealed jouvre lheritage pour queleque classe
+     */
     public String format(Notification notification) {
         if (notification instanceof EmailNotification email) {
             return "[EMAIL → " + email.email() + "] " + email.subject();

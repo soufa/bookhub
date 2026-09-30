@@ -21,13 +21,17 @@ public class BorrowHistory {
     private final Deque<BorrowEvent> events = new ArrayDeque<>();
     private final int maxSize;
 
+
     public BorrowHistory(int maxSize) {
         if (maxSize <= 0) {
             throw new IllegalArgumentException("maxSize must be > 0");
         }
         this.maxSize = maxSize;
     }
-
+    /***
+     * Comment BorrowHistory limite-t-elle sa taille en mémoire ?
+     * la limite memoire est controlle par maxsize
+     */
     public void record(BorrowEvent event) {
         Objects.requireNonNull(event, "Event required");
         events.addLast(event);

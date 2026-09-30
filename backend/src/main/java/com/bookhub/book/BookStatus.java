@@ -9,6 +9,10 @@ public enum BookStatus {
 
     private final String description;
 
+    /***
+     * combien des valeurs fixe, des donnes associées et des comportement
+     * @param description
+     */
     BookStatus(String description) {
         this.description = description;
     }
