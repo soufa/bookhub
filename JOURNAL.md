@@ -69,3 +69,30 @@ Vous n'avez jamais besoin d'ajouter JUnit manuellement. Si vous voyez une recomm
 - Sealed interface pour `Notification` (Email, SMS)
 - Pattern matching `instanceof` appliqué dans le code
 - 8 Q/R supplémentaires (Q22 → Q29)
+---
+
+## 2026-09-30 (mercredi) — J7
+
+### ✅ Fait
+- `GreetingService` : `@Service` + `@Value` injection
+- `AppConfig` : `@Configuration` + `@Bean` (Clock, String)
+- `LifecycleBean` : `@Component` + `@PostConstruct` / `@PreDestroy`
+- 5 tests Spring (`@ContextConfiguration`)
+- **Total tests : 55**
+- 8 Q/R entretien (Q46 → Q53) → **total 53**
+
+### 💡 Appris
+- IoC : Spring crée et gère les objets
+- DI par constructeur = best practice
+- `@Component` / `@Service` / `@Repository` / `@Controller`
+- `@Bean` pour types externes (Clock, String)
+- `@Value` avec valeur par défaut `${clé:défaut}`
+- `@PostConstruct` / `@PreDestroy` (cycle de vie)
+- Bean singleton par défaut
+- `ApplicationContext` = conteneur IoC
+
+### 🎯 Demain (J8)
+- Spring Boot + premier `@RestController`
+- `@GetMapping`, `@PostMapping`
+- `@RequestParam`, `@PathVariable`
+- 8 Q/R supplémentaires (Q54 → Q61)

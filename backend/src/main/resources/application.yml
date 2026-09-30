@@ -11,10 +11,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
 
   flyway:
@@ -25,14 +25,10 @@ spring:
 server:
   port: 8080
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
-  endpoint:
-    health:
-      show-details: always
+bookhub:
+  greeting:
+    message: "Bienvenue dans BookHub"
+  environment: ${SPRING_PROFILES_ACTIVE:dev}
 
 springdoc:
   swagger-ui:

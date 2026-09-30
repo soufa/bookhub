@@ -490,3 +490,101 @@ long count = stream.count();
 **R courte** : CPU-bound, gros volumes (milliers+), pas d'effet de bord, opérations associatives. Sinon, l'overhead dépasse le gain.
 
 **Piège** : parallelStream sur I/O-bound ou petits volumes = plus lent que séquentiel. Toujours mesurer avant.**
+
+---
+
+## Spring — Core (IoC & DI)
+
+### Q46. Qu'est-ce que l'Inversion de Contrôle (IoC) ?
+
+**R courte** : Principe où le conteneur (Spring) crée et gère les objets, au lieu que ce soit le code qui instancie (`new`). Le contrôle est inversé : au lieu d'appeler `new Service()`, on demande au conteneur.
+
+**Exemple** :
+// Sans Spring
+NotificationService service = new NotificationService(new EmailSender());
+
+// Avec Spring
+@Autowired
+NotificationService service;   // Spring l'a créé et injecté
+
+###Q47. Différence entre @Component, @Service, @Repository, @Controller ?
+**R courte** : Tous sont des stéréotypes Spring (spécialisations de @Component). Ils ont la même fonction technique mais une intention sémantique différente :
+
+@Component : générique
+
+@Service : logique métier
+
+@Repository : accès aux données (+ traduction des exceptions)
+
+@Controller / @RestController : couche web
+
+**Piège** : @Repository active la traduction des exceptions JPA (DataAccessException). Pas les autres.
+
+###Q48. Injection par constructeur vs par champ vs par setter ?
+**R courte** :
+
+Constructeur : recommandé (immuabilité, testabilité, détection des dépendances manquantes au démarrage)
+
+Setter : pour les dépendances optionnelles
+
+Champ : à éviter (impossible à tester sans Spring, masque les dépendances)
+
+**Exemple** :
+
+java
+// ✅ Constructeur
+public BookService(BookRepository repo) { this.repo = repo; }
+
+// ❌ Champ
+@Autowired private BookRepository repo;
+**Piège** : l'injection par champ ne permet pas l'utilisation du mot-clé final sur la dépendance.
+
+###Q49. @Configuration + @Bean vs @Component ?
+**R courte** :
+
+@Component : sur une classe, Spring la détecte par scan
+
+@Configuration + @Bean : sur une méthode, Spring appelle la méthode pour créer le bean
+
+Quand utiliser @Bean : quand vous ne pouvez pas annoter la classe (ex: Clock, String, librairie tierce).
+
+**Piège** : une méthode @Bean dans une classe @Configuration est proxifiée — Spring garantit qu'elle renvoie toujours le même singleton.
+
+###Q50. @Value — comment l'utiliser ?
+**R courte** : Injecte une valeur depuis application.yml / application.properties ou une variable d'environnement.
+
+**Exemple* :
+
+java
+@Value("${bookhub.greeting.message:Hello}")
+private String message;
+**Piège** : syntaxe ${clé:valeur_par_défaut}. Sans valeur par défaut, si la clé est absente → IllegalArgumentException au démarrage.
+
+
+###Q51. Qu'est-ce que @PostConstruct / @PreDestroy ?
+**R courte** :
+
+@PostConstruct : appelé après l'injection des dépendances, avant que le bean soit utilisé
+
+@PreDestroy : appelé avant la destruction du contexte Spring
+
+Utile pour : ouvrir/fermer des ressources, initialiser des caches, logger le démarrage.
+
+**Piège** : en Java 17, ces annotations viennent de jakarta.annotation (avant : javax.annotation).
+
+### Q52. Qu'est-ce qu'un bean singleton par défaut ?
+**R courte** : Un bean Spring est singleton par défaut : une seule instance partagée par toute l'application.
+
+**Autres scopes** : prototype (nouvelle instance à chaque demande), request, session (web).
+
+**Piège** : un singleton ne doit jamais avoir d'état mutable partagé. Sinon → problèmes de concurrence.
+
+###Q53. Qu'est-ce que ApplicationContext ?
+**R courte** : Le conteneur IoC de Spring. Il gère le cycle de vie des beans, l'injection des dépendances, la résolution des propriétés.
+
+**Exemple** :
+
+java
+ApplicationContext ctx = new AnnotationConfigApplicationContext(AppConfig.class);
+GreetingService service = ctx.getBean(GreetingService.class);
+**Piège** : en Spring Boot, l'ApplicationContext est créé automatiquement par SpringApplication.run(). On n'a pas besoin de l'instancier à la main.

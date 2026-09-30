@@ -1,53 +1,34 @@
 package com.bookhub.shared.domain;
 
-
 import java.util.Objects;
 
-/***
+/**
+ * Value Object représentant un ISBN.
  *
- * deux objets meme valeurs sont consideres eqaux
- * et considere comme ValueObject (son identité est definie par sa valeur)
- * et pas une entite
+ * <p>Deux objets ISBN de même valeur sont égaux (égalité structurelle).
+ * Un Value Object n'a pas d'identité propre — il est défini par sa valeur.
+ * À ne pas confondre avec une Entity (qui aurait un identifiant stable).</p>
+ *
+ * <p>Record = immuable par défaut. Les accesseurs, equals et hashCode
+ * sont générés automatiquement par le compilateur.</p>
  */
-public final class Isbn{
-    private final String identifiant;
+public record Isbn(String value) {
 
-
-    public Isbn(String identifiant) {
-        this.identifiant = Objects.requireNonNull(identifiant);
-    }
-
-    public String getIdentifiant() {
-        return identifiant;
-    }
-
-    @Override
-    public boolean equals(Object id) {
-        if(id!=null && (id instanceof Isbn) ){
-            return identifiant.equals(((Isbn) id).identifiant);
-    }
-        return false;
-    }
-
-    /***
-     * le bucket regroupe tous les objets qui ont meme le hashcode
-     * et ensuite on utilise equals pour distinguer lobjet exacte
-     * *** si nous avons 3 objets dans le meme buket et qui ont le meme hashcode on parle de collision ,
-     * et pour remedier a ce probleme on utilise equals
-     * hashMap et hashSet se sont des tables de hashage , ses tables peuvent mal fonctionner
-     * si equals et hashcode sont mal definie dans la classe de l'objet lui meme
-     * En deux etape;
-     * Hashmap on localise un bucket puis avec equals on trouve lobjet exacte a linterieur,
-     * hashmap chaque cle est unique mais peuvent avoir meme valeur
-     * hashmap sert a stocket des cle et des valeurs
-     * HashSet fonction pareil , garde seulement une seule occurence de chaque objet
-     * Haset pas ce key value , lutilité est de garder une collection sans doublons ,
-     * s'appuie de hashcode et equals pour fontionner corretctement
-     *
-     * @return
+    /**
+     * Compact constructor : appelé avant l'affectation automatique du champ.
+     * Permet la validation et la normalisation.
      */
-    @Override
-    public int hashCode() {
-        return identifiant.hashCode();
+    public Isbn {
+        Objects.requireNonNull(value, "ISBN required");
+
+        // Normalisation : retire tirets et espaces
+        String cleaned = value.replaceAll("[-\\s]", "");
+
+        // Validation : ISBN-10 ou ISBN-13
+        if (!cleaned.matches("\\d{10}|\\d{13}")) {
+            throw new IllegalArgumentException("Invalid ISBN: " + value);
+        }
+
+        value = cleaned;
     }
 }
