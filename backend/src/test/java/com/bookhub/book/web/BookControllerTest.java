@@ -8,6 +8,7 @@ import com.bookhub.shared.domain.Money;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -22,7 +23,23 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Erreur — Spring Security actif dans les tests @WebMvcTest
+ * Les erreurs 401 et 403 viennent de Spring Security. Vous l'avez exclu dans BookHubApplication pour l'app, mais @WebMvcTest charge un contexte séparé qui active la sécurité par défaut.
+ *
+ * Résultat : vos endpoints sont protégés dans les tests → 401 (non authentifié) ou 403 (interdit).
+ *
+ * Solution — Désactiver les filtres de sécurité dans les tests
+ * Une seule ligne à ajouter dans BookControllerTest.java :
+ *
+ * java
+ * @WebMvcTest(BookController.class)
+ * @AutoConfigureMockMvc(addFilters = false)   // ← AJOUTER CETTE LIGNE
+ * class BookControllerTest {
+ */
 @WebMvcTest(com.bookhub.book.web.BookController.class)
+@AutoConfigureMockMvc(addFilters = false)   // ← AJOUTER CETTE LIGNE
+
 class BookControllerTest {
     /**
      * @WebMvcTest : charge uniquement la couche web (pas de JPA, pas de BDD)
