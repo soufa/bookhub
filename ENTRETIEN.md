@@ -460,7 +460,7 @@ java
 ));
 **Piège** : toujours fournir une merge function si les clés peuvent être dupliquées. toMap refuse null en valeur.
 
-###Q43. groupingBy avec downstream — à quoi ça sert ?
+### Q43. groupingBy avec downstream — à quoi ça sert ?
 **R courte** : Le 2ᵉ argument est un collector appliqué à chaque groupe. Permet de compter, moyenner, mapper à l'intérieur de chaque groupe.
 
 **Exemple** :
@@ -507,7 +507,7 @@ NotificationService service = new NotificationService(new EmailSender());
 @Autowired
 NotificationService service;   // Spring l'a créé et injecté
 
-###Q47. Différence entre @Component, @Service, @Repository, @Controller ?
+### Q47. Différence entre @Component, @Service, @Repository, @Controller ?
 **R courte** : Tous sont des stéréotypes Spring (spécialisations de @Component). Ils ont la même fonction technique mais une intention sémantique différente :
 
 @Component : générique
@@ -520,7 +520,7 @@ NotificationService service;   // Spring l'a créé et injecté
 
 **Piège** : @Repository active la traduction des exceptions JPA (DataAccessException). Pas les autres.
 
-###Q48. Injection par constructeur vs par champ vs par setter ?
+### Q48. Injection par constructeur vs par champ vs par setter ?
 **R courte** :
 
 Constructeur : recommandé (immuabilité, testabilité, détection des dépendances manquantes au démarrage)
@@ -539,7 +539,7 @@ public BookService(BookRepository repo) { this.repo = repo; }
 @Autowired private BookRepository repo;
 **Piège** : l'injection par champ ne permet pas l'utilisation du mot-clé final sur la dépendance.
 
-###Q49. @Configuration + @Bean vs @Component ?
+### Q49. @Configuration + @Bean vs @Component ?
 **R courte** :
 
 @Component : sur une classe, Spring la détecte par scan
@@ -550,7 +550,7 @@ Quand utiliser @Bean : quand vous ne pouvez pas annoter la classe (ex: Clock, St
 
 **Piège** : une méthode @Bean dans une classe @Configuration est proxifiée — Spring garantit qu'elle renvoie toujours le même singleton.
 
-###Q50. @Value — comment l'utiliser ?
+### Q50. @Value — comment l'utiliser ?
 **R courte** : Injecte une valeur depuis application.yml / application.properties ou une variable d'environnement.
 
 **Exemple* :
