@@ -96,3 +96,8 @@ Vous n'avez jamais besoin d'ajouter JUnit manuellement. Si vous voyez une recomm
 - `@GetMapping`, `@PostMapping`
 - `@RequestParam`, `@PathVariable`
 - 8 Q/R supplémentaires (Q54 → Q61)
+
+###Note importante
+Les tests Spring (@ContextConfiguration) ne chargent QUE les classes spécifiées. Ils ne chargent pas JPA, la base de données, ou le contexte Spring Boot complet. C'est volontaire : les tests restent rapides et isolés.
+
+Si @ContextConfiguration échoue (ex: @Value ne trouve pas de propriété), utilisez @TestPropertySource pour fournir les valeurs manquantes.
