@@ -588,3 +588,104 @@ java
 ApplicationContext ctx = new AnnotationConfigApplicationContext(AppConfig.class);
 GreetingService service = ctx.getBean(GreetingService.class);
 **Piège** : en Spring Boot, l'ApplicationContext est créé automatiquement par SpringApplication.run(). On n'a pas besoin de l'instancier à la main.
+
+---
+
+## Spring — Web / REST
+
+### Q54. Différence entre `@Controller` et `@RestController` ?
+
+**R courte** : `@Controller` retourne une vue (HTML). `@RestController` = `@Controller` + `@ResponseBody` sur chaque méthode → retourne du JSON/XML directement.
+
+**Piège** : avec `@Controller`, il faut `@ResponseBody` sur chaque méthode pour retourner du JSON.
+
+**Vécu** : (à remplir)
+
+---
+
+### Q55. Différence entre `@PathVariable` et `@RequestParam` ?
+
+**R courte** : `@PathVariable` extrait une partie de l'URL (`/books/{id}`). `@RequestParam` extrait un query param (`/books?status=AVAILABLE`).
+
+**Exemple** :
+@GetMapping("/{id}")                       // /books/42
+public Book getById(@PathVariable Long id) { ... }
+
+@GetMapping                               // /books?status=AVAILABLE
+public List<Book> list(@RequestParam String status) { ... }
+**Piège** : @RequestParam a un attribut required=true par défaut. Pour rendre optionnel : @RequestParam(required = false)
+
+
+### Q56. Que signifie ResponseEntity<T> ?
+**R courte** : Encapsule la réponse HTTP complète : code statut, headers, body.
+
+**Exemple** :
+
+java
+return ResponseEntity
+    .created(URI.create("/api/books/" + id))
+    .body(createdBook);
+**Piège** : sans ResponseEntity, le code est toujours 200 (même pour un POST). Utiliser ResponseEntity pour contrôler les codes 201, 204, 404.
+
+### Q57. Comment valider les données entrantes ?
+**R courte** : Avec @Valid + annotations Bean Validation (@NotNull, @Size, @Email). Les erreurs sont capturées et retournées en 400 par Spring.
+
+**Exemple** :
+
+java
+@PostMapping
+public Book create(@Valid @RequestBody BookDto dto) { ... }
+**Piège** : sans @Valid, les validations ne s'exécutent pas. @Valid à mettre avant @RequestBody.
+
+### Q58. Que fait @RequestMapping ?
+**R courte** : Associe une URL à un controller ou à une méthode. Peut être spécialisé : @GetMapping, @PostMapping, etc.
+
+**Exemple** :
+
+java
+@RestController
+@RequestMapping("/api/books")   // base URL
+public class BookController {
+    @GetMapping("/{id}")          // → /api/books/{id}
+    public Book get(@PathVariable Long id) { ... }
+}
+**Piège** : @RequestMapping sur la classe = préfixe. Les annotations sur les méthodes ajoutent le suffixe.
+
+### Q59. Comment retourner un code 201 (Created) ?
+**R courte** : Utiliser ResponseEntity.created(URI). Le Location header indique l'URL de la ressource créée.
+
+**Exemple** :
+
+java
+return ResponseEntity
+    .created(URI.create("/api/books/" + id))
+    .body(book);
+**Piège** : renvoyer ResponseEntity.ok(book) pour un POST = code 200 au lieu de 201. Non conforme REST.
+
+
+### Q60. Comment tester un controller sans démarrer le serveur ?
+**R courte** : Avec @WebMvcTest + MockMvc. @WebMvcTest charge uniquement la couche web. MockMvc simule des requêtes HTTP.
+
+**Exemple** :
+
+java
+@WebMvcTest(BookController.class)
+class BookControllerTest {
+    @Autowired MockMvc mockMvc;
+    @MockBean BookService service;
+    
+    @Test void should_return_200() throws Exception {
+        mockMvc.perform(get("/api/books")).andExpect(status().isOk());
+    }
+}
+**Piège** : @WebMvcTest ne charge pas les autres couches (services, repositories). Il faut @MockBean pour les dépendances.
+
+### Q61. Que fait @RequestBody ?
+**R courte** : Désérialise le body HTTP (JSON) en objet Java, via Jackson.
+
+**Exemple** :
+
+java
+@PostMapping
+public Book create(@RequestBody BookDto dto) { ... }
+**Piège** : si le JSON est mal formé → HttpMessageNotReadableException → code 400. Sans @RequestBody, Spring ne peut pas mapper le body.

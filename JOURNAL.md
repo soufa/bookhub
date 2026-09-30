@@ -101,3 +101,40 @@ Vous n'avez jamais besoin d'ajouter JUnit manuellement. Si vous voyez une recomm
 Les tests Spring (@ContextConfiguration) ne chargent QUE les classes spécifiées. Ils ne chargent pas JPA, la base de données, ou le contexte Spring Boot complet. C'est volontaire : les tests restent rapides et isolés.
 
 Si @ContextConfiguration échoue (ex: @Value ne trouve pas de propriété), utilisez @TestPropertySource pour fournir les valeurs manquantes.
+
+
+---
+
+## `JOURNAL.md` J8
+
+**Ajoutez** :
+
+```markdown
+---
+
+## 2026-10-02 (vendredi) — J8
+
+### ✅ Fait
+- `BookService` : CRUD en mémoire (`ConcurrentHashMap` + `AtomicLong`)
+- `BookController` : 5 endpoints REST (`GET all`, `GET by id`, `POST`, `PUT`, `DELETE`)
+- 6 tests `BookServiceTest`
+- 6 tests `BookControllerTest` (`@WebMvcTest` + MockMvc)
+- HelloController supprimé
+- **Total tests : 67**
+- 8 Q/R entretien (Q54 → Q61) → **total 61**
+
+### 💡 Appris
+- `@RestController` = `@Controller` + `@ResponseBody`
+- `@RequestMapping` sur la classe = préfixe URL
+- `@PathVariable` vs `@RequestParam`
+- `ResponseEntity` pour contrôler le code HTTP
+- `@WebMvcTest` : tests isolés de la couche web
+- `MockMvc` : simuler des requêtes HTTP
+- `@MockBean` : remplacer une dépendance par un mock
+- Codes HTTP : 200, 201, 204, 400, 404
+
+### 🎯 Demain (J9)
+- CRUD REST complet avec pagination
+- `@RequestParam` avec `Pageable`
+- Recherche multi-critères
+- 8 Q/R supplémentaires (Q62 → Q69)
