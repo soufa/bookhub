@@ -774,3 +774,62 @@ GET /api/books?page=0&size=10&sort=author,asc&sort=title,asc
 **R courte** : Pageable encapsule page, size, sort. Spring le construit automatiquement depuis les query params. Testable, réutilisable, cohérent avec Spring Data JPA.
 
 **Piège** : avec Pageable, le tri par défaut peut être manipulé par le client. Restreindre les champs triables en production.**
+
+
+---
+
+## Spring — DTO & Validation
+
+### Q70. Pourquoi séparer `CreateBookRequest` et `BookResponse` ?
+
+**R courte** : Sécurité et clarté. Le client ne doit pas pouvoir envoyer un `id` sur POST, ni recevoir des champs internes.
+
+**Piège** : exposer directement l'entité JPA → fuite de données, couplage fort, sécurité cassée.
+
+**Vécu** : (à remplir)
+
+---
+
+### Q71. Comment valider un DTO entrant ?
+
+**R courte** : Annotations Bean Validation (`@NotBlank`, `@Size`, `@Positive`) + `@Valid` sur le paramètre du controller.
+
+**Exemple** :
+**java**
+public record CreateBookRequest(
+    @NotBlank String title,
+    @Positive BigDecimal price
+) {}
+
+@PostMapping
+public BookResponse create(@Valid @RequestBody CreateBookRequest request) { ... }
+**Piège** : sans @Valid, les annotations sont ignorées.
+
+### Q72. Différence entre @NotNull, @NotEmpty et @NotBlank ?
+**R courte** : @NotNull refuse null. @NotEmpty refuse null + vide. @NotBlank refuse null + vide + espaces seuls.
+
+**Piège** : pour les chaînes utilisateur, préférer @NotBlank.
+
+### Q73. Comment gérer les erreurs de validation ?
+**R courte** : MethodArgumentNotValidException est levée par Spring. On l'intercepte dans @RestControllerAdvice pour retourner un ProblemDetail avec les erreurs par champ.
+
+**Piège** : le JSON retourné doit être exploitable par le client (champ → message).
+
+
+### Q74. Pourquoi utiliser un Mapper ?
+**R courte** : Convertir entre les couches (Entity ↔ DTO ↔ Domain). Évite la duplication, centralise la transformation.
+
+**Piège** : ne pas mettre la logique métier dans le mapper.
+
+### Q75. Que fait @Valid en cascade ?
+**R courte** : Si un DTO contient un objet avec @Valid, Spring valide récursivement les champs imbriqués.
+
+**Piège** : sans @Valid sur le champ imbriqué, la validation ne descend pas.
+
+### Q76. Comment tester une API REST complète ?
+**R courte** : @SpringBootTest + @AutoConfigureMockMvc. Charge tout le contexte et simule des requêtes HTTP.
+
+**Piège** : plus lent que @WebMvcTest. À réserver aux scénarios bout-en-bout.
+
+### Q77. Différence entre test unitaire et test d'intégration ?
+**R courte** : Unitaire = une classe isolée (mock). Intégration = plusieurs couches (controller + service + BDD). Ratio recommandé : 80 % unitaires / 20 % intégration.

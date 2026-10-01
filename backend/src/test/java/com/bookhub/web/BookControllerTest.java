@@ -5,6 +5,8 @@ import com.bookhub.book.BookService;
 import com.bookhub.book.BookStatus;
 import com.bookhub.shared.domain.Isbn;
 import com.bookhub.shared.domain.Money;
+import com.bookhub.web.dto.BookMapper;
+import com.bookhub.web.dto.CreateBookRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import static org.mockito.ArgumentMatchers.eq;
@@ -25,6 +28,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import com.bookhub.web.dto.BookResponse;
+import org.junit.jupiter.api.BeforeEach;
+
+import java.util.Currency;
+
+import static org.mockito.ArgumentMatchers.anyList;
 
 /**
  * Erreur — Spring Security actif dans les tests @WebMvcTest
@@ -62,9 +71,43 @@ class BookControllerTest {
     @MockBean
     private BookService service;
 
+
+    @MockBean
+    private BookMapper mapper;
+
+    //Avant
     private final BookDto sample = new BookDto(1L, "Effective Java", "Joshua Bloch",
             new Isbn("9780134685991"), Money.of("45.00", "EUR"), BookStatus.AVAILABLE);
+    // Après
+    CreateBookRequest request = new CreateBookRequest(
+            "Effective Java", "Joshua Bloch", "9780134685991",
+            new BigDecimal("45.00"), "EUR");
 
+    @BeforeEach
+    void setUp() {
+        when(mapper.toResponse(any(BookDto.class)))
+                .thenAnswer(inv -> {
+                    BookDto dto = inv.getArgument(0);
+                    return new BookResponse(dto.id(), dto.title(), dto.author(),
+                            dto.isbn(), dto.price(), dto.status());
+                });
+        when(mapper.toResponseList(anyList()))
+                .thenAnswer(inv -> {
+                    List<BookDto> list = inv.getArgument(0);
+                    return list.stream()
+                            .map(d -> new BookResponse(d.id(), d.title(), d.author(),
+                                    d.isbn(), d.price(), d.status()))
+                            .toList();
+                });
+        when(mapper.toDomain(any(CreateBookRequest.class)))
+                .thenAnswer(inv -> {
+                    CreateBookRequest r = inv.getArgument(0);
+                    return new BookDto(null, r.title(), r.author(),
+                            new Isbn(r.isbn()),
+                            new Money(r.price(), Currency.getInstance(r.currency())),
+                            BookStatus.AVAILABLE);
+                });
+    }
     @Test
     void should_return_all_books() throws Exception {
         var page = new PageImpl<>(
@@ -100,17 +143,39 @@ class BookControllerTest {
 
     @Test
     void should_create_book() throws Exception {
-        BookDto noId = new BookDto(null, "Effective Java", "Joshua Bloch",
-                new Isbn("9780134685991"), Money.of("45.00", "EUR"), BookStatus.AVAILABLE);
-        when(service.create(any())).thenReturn(sample);
+        when(service.create(any(BookDto.class))).thenReturn(sample);
 
         mockMvc.perform(post("/api/books")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(noId)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.title").value("Effective Java"));
     }
 
+    /**
+     * Ce test doit échouer car @Valid va lever MethodArgumentNotValidException → pas gérée par votre GlobalExceptionHandler actuel.
+     *
+     * Ajoutez ce handler dans GlobalExceptionHandler :
+     * @throws Exception
+     */
+    @Test
+    void should_reject_invalid_create_request() throws Exception {
+        String invalid = """
+        {
+          "title": "",
+          "author": "",
+          "isbn": "123",
+          "price": -5,
+          "currency": "EU"
+        }
+        """;
+
+        mockMvc.perform(post("/api/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalid))
+                .andExpect(status().isBadRequest());
+    }
     @Test
     void should_delete_book() throws Exception {
         when(service.delete(1L)).thenReturn(true);

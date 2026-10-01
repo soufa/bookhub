@@ -164,3 +164,54 @@ Si @ContextConfiguration échoue (ex: @Value ne trouve pas de propriété), util
 - DTO + Mapper (séparation Entity/DTO)
 - Validation avancée (`@Valid`, `@NotNull`)
 - Tests d'intégration REST
+
+ 
+
+
+
+---
+
+## Étape 2 — Remplir `JOURNAL.md` J10
+
+##### Théorie express (30 min)
+Bean Validation : annotations standard (JSR 380) pour valider les données.
+Annotation	Rôle
+@NotNull	Refuse null
+@NotBlank	Refuse null + vide + espaces
+@Size(min, max)	Longueur de chaîne
+@Min, @Max	Bornes numériques
+@Email	Format email
+@Valid	Active la validation en cascade
+
+**Ajoutez** :
+
+```markdown
+---
+
+## 2026-10-01 (jeudi) — J10
+
+### ✅ Fait
+- `CreateBookRequest` (DTO + validation Bean Validation)
+- `BookResponse` (DTO sortie)
+- `BookMapper` (conversion Domain ↔ DTO)
+- `BookController` utilise les DTO
+- `GlobalExceptionHandler` : `MethodArgumentNotValidException` → `ProblemDetail`
+- `BookIntegrationTest` : CRUD complet end-to-end
+- H2 pour les tests (`application-test.yml`)
+- **Total tests : 72**
+- 8 Q/R entretien (Q70 → Q77) → total 77
+
+### 💡 Appris
+- Séparation DTO entrée/sortie (sécurité)
+- Bean Validation : `@NotBlank`, `@Positive`, `@Size`
+- `@Valid` sur le paramètre
+- `MethodArgumentNotValidException` → errors par champ
+- `@MockBean BookMapper` obligatoire dans `@WebMvcTest`
+- `@SpringBootTest` + `@AutoConfigureMockMvc` : tests d'intégration
+- H2 en mémoire pour les tests (rapide)
+
+### 🎯 Vendredi-Dimanche : REVUE 10 JOURS
+- Revoir tous les concepts Java (S1 : J1 → J6)
+- Revoir Spring Core + Web (S2 : J7 → J10)
+- Relire les 77 Q/R
+- Consolider `APPRENTISSAGE.md`
