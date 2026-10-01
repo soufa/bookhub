@@ -1,4 +1,4 @@
-package com.bookhub.book.web;
+package com.bookhub.web;
 
 import com.bookhub.book.BookDto;
 import com.bookhub.book.BookService;
@@ -16,12 +16,15 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Optional;
+import static org.mockito.ArgumentMatchers.eq;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Erreur — Spring Security actif dans les tests @WebMvcTest
@@ -37,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @AutoConfigureMockMvc(addFilters = false)   // ← AJOUTER CETTE LIGNE
  * class BookControllerTest {
  */
-@WebMvcTest(com.bookhub.book.web.BookController.class)
+@WebMvcTest(BookController.class)
 @AutoConfigureMockMvc(addFilters = false)   // ← AJOUTER CETTE LIGNE
 
 class BookControllerTest {
@@ -64,12 +67,18 @@ class BookControllerTest {
 
     @Test
     void should_return_all_books() throws Exception {
-        when(service.findAll()).thenReturn(List.of(sample));
+        var page = new PageImpl<>(
+                List.of(sample),
+                PageRequest.of(0, 10),
+                1
+        );
+        when(service.findAll(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Effective Java"))
-                .andExpect(jsonPath("$[0].id").value(1));
+                .andExpect(jsonPath("$.content[0].title").value("Effective Java"))
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test
@@ -116,5 +125,41 @@ class BookControllerTest {
 
         mockMvc.perform(delete("/api/books/999"))
                 .andExpect(status().isNotFound());
+    }
+    @Test
+    void should_return_paginated_books() throws Exception {
+        var page = new org.springframework.data.domain.PageImpl<>(
+                List.of(sample),
+                org.springframework.data.domain.PageRequest.of(0, 10),
+                1
+        );
+        when(service.findAll(any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/api/books?page=0&size=10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].title").value("Effective Java"))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void should_return_404_with_problem_detail() throws Exception {
+        when(service.findById(999L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/books/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title").value("Book not found"))
+                .andExpect(jsonPath("$.bookId").value(999))
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void should_search_by_title() throws Exception {
+        when(service.search(eq("java"), any(), any()))
+                .thenReturn(List.of(sample));
+
+        mockMvc.perform(get("/api/books/search?title=java"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Effective Java"));
     }
 }

@@ -689,3 +689,88 @@ java
 @PostMapping
 public Book create(@RequestBody BookDto dto) { ... }
 **Piège** : si le JSON est mal formé → HttpMessageNotReadableException → code 400. Sans @RequestBody, Spring ne peut pas mapper le body.
+
+## Spring — REST avancé
+
+### Q62. Comment implémenter la pagination en Spring ?
+
+**R courte** : Injecter `Pageable` en paramètre, utiliser `@PageableDefault` pour les valeurs par défaut. Spring construit automatiquement le `Pageable` depuis `?page=0&size=10&sort=title`.
+
+**Exemple** 
+**java**
+@GetMapping
+public Page<BookDto> listAll(@PageableDefault(size = 10, sort = "title") Pageable pageable) {
+    return service.findAll(pageable);
+}
+
+**Piège** : Page<T> retourne content, totalElements, totalPages, number, size. Ce n'est pas une simple List
+
+
+### Q63. Différence entre Page<T>, Slice<T> et List<T> ?
+**R courte** :
+
+List<T> : pas de métadonnées de pagination
+
+Slice<T> : indique s'il y a une page suivante (hasNext)
+
+Page<T> : + total d'éléments, total de pages
+
+**Piège** : Page<T> fait un count() supplémentaire. Slice<T> est plus rapide quand on n'a pas besoin du total.
+
+### Q64. Comment gérer les erreurs globalement ?
+**R courte** : Avec @RestControllerAdvice + @ExceptionHandler. Chaque handler mappe une exception → réponse HTTP.
+
+**Exemple** :
+
+java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(BookNotFoundException.class)
+    public ProblemDetail handle(BookNotFoundException ex) { ... }
+}
+**Piège** : sans @RestControllerAdvice, il faut try/catch dans chaque controller (verbeux). Les exceptions non gérées → 500.
+
+### Q65. Qu'est-ce que le RFC 7807 (ProblemDetail) ?
+**R courte** : Standard IETF pour les erreurs API REST. Champs : type, title, status, detail, instance. Spring 6 l'implémente via ProblemDetail.
+
+**Exemple** :
+
+json
+{
+  "type": "https://bookhub.example.com/errors/not-found",
+  "title": "Book not found",
+  "status": 404,
+  "detail": "Book not found with id: 999",
+  "bookId": 999
+}
+**Piège** : type est une URI documentant la classe d'erreur. detail est le message spécifique. bookId est un champ custom.
+
+### Q66. Quand lever une exception vs retourner ResponseEntity.notFound() ?
+**R courte** : 
+Lever une exception dès que la logique métier ne peut pas continuer. Le handler global s'occupe de la réponse HTTP. C'est plus lisible et centralisé.
+
+**Piège** : ResponseEntity.notFound() dans chaque méthode = duplication. La bonne pratique est orElseThrow(() -> new BookNotFoundException(id)).
+
+### Q67. Comment valider un DTO entrant ?
+**R courte** : @Valid + annotations Bean Validation (@NotNull, @Size, @Email). En cas d'erreur, Spring retourne un 400 automatique.
+
+**Exemple** :
+
+java
+@PostMapping
+public Book create(@Valid @RequestBody BookDto dto) { ... }
+**Piège** : sans @Valid, les annotations sont ignorées. @Valid avant @RequestBody.
+
+### Q68. Comment trier par plusieurs champs dans une requête paginée ?
+**R courte** : ?sort=title,asc&sort=price,desc. Spring supporte le multi-tri avec des virgules.
+
+**Exemple** :
+
+text
+GET /api/books?page=0&size=10&sort=author,asc&sort=title,asc
+**Piège** : le tri sur des champs JPA doit correspondre aux noms de colonnes/propriétés. Les champs non triables doivent être rejetés (sécurité).
+
+### Q69. Pourquoi utiliser Pageable plutôt que page + size bruts ?
+**R courte** : Pageable encapsule page, size, sort. Spring le construit automatiquement depuis les query params. Testable, réutilisable, cohérent avec Spring Data JPA.
+
+**Piège** : avec Pageable, le tri par défaut peut être manipulé par le client. Restreindre les champs triables en production.**

@@ -109,7 +109,6 @@ Si @ContextConfiguration échoue (ex: @Value ne trouve pas de propriété), util
 
 **Ajoutez** :
 
-```markdown
 ---
 
 ## 2026-10-02 (vendredi) — J8
@@ -138,3 +137,30 @@ Si @ContextConfiguration échoue (ex: @Value ne trouve pas de propriété), util
 - `@RequestParam` avec `Pageable`
 - Recherche multi-critères
 - 8 Q/R supplémentaires (Q62 → Q69)
+
+
+---
+
+## 2026-10-01 (jeudi) — J9
+
+### ✅ Fait
+- `BookNotFoundException` (exception métier)
+- `GlobalExceptionHandler` + `ProblemDetail` (RFC 7807)
+- Pagination : `Pageable` + `Page<T>` + `@PageableDefault`
+- Recherche multi-critères (`/api/books/search?title=&author=&status=`)
+- Tests MockMvc : pagination + ProblemDetail + search
+- **Total tests : 70**
+- 8 Q/R entretien (Q62 → Q69) → total 69
+
+### 💡 Appris
+- `Pageable` + `Page<T>` : pagination native Spring Data
+- `@PageableDefault(size, sort)` : valeurs par défaut
+- `@RestControllerAdvice` : gestion d'erreurs centralisée
+- `ProblemDetail` : implémentation RFC 7807 (Spring 6)
+- `orElseThrow()` : plus lisible que `ResponseEntity.notFound()`
+- Multi-tri : `?sort=title,asc&sort=price,desc`
+
+### 🎯 Demain (J10)
+- DTO + Mapper (séparation Entity/DTO)
+- Validation avancée (`@Valid`, `@NotNull`)
+- Tests d'intégration REST

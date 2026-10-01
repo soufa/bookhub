@@ -1,11 +1,11 @@
 package com.bookhub.book;
 
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import java.util.Comparator;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -54,5 +54,27 @@ public class BookService {
 
     public int size() {
         return books.size();
+    }
+    public Page<BookDto> findAll(Pageable pageable) {
+        List<BookDto> all = new ArrayList<>(books.values());
+        all.sort(Comparator.comparing(BookDto::title));
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), all.size());
+
+        if (start > all.size()) {
+            return new PageImpl<>(List.of(), pageable, all.size());
+        }
+
+        return new PageImpl<>(all.subList(start, end), pageable, all.size());
+    }
+
+    public List<BookDto> search(String title, String author, BookStatus status) {
+        return books.values().stream()
+                .filter(b -> title == null || b.title().toLowerCase().contains(title.toLowerCase()))
+                .filter(b -> author == null || b.author().toLowerCase().contains(author.toLowerCase()))
+                .filter(b -> status == null || b.status() == status)
+                .sorted(Comparator.comparing(BookDto::title))
+                .toList();
     }
 }
