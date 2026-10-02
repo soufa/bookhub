@@ -1,80 +1,111 @@
 package com.bookhub.book;
 
-import org.springframework.stereotype.Service;
+import com.bookhub.shared.domain.Isbn;
+import com.bookhub.shared.domain.Money;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import java.util.Comparator;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-/**
- * @Service : Spring le détecte au scan
- *
- * ConcurrentHashMap : thread-safe (plusieurs requêtes HTTP simultanées)
- *
- * AtomicLong : générateur d'ID sans race condition
- */
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class BookService {
 
-    private final Map<Long, BookDto> books = new ConcurrentHashMap<>();
-    private final AtomicLong idGenerator = new AtomicLong(1);
+    private final BookRepository repository;
 
-    public List<BookDto> findAll() {
-        return new ArrayList<>(books.values());
+    public BookService(BookRepository repository) {
+        this.repository = repository;
     }
 
-    public Optional<BookDto> findById(Long id) {
-        return Optional.ofNullable(books.get(id));
-    }
-
-    public BookDto create(BookDto dto) {
-        Long id = idGenerator.getAndIncrement();
-        BookDto persisted = new BookDto(
-                id, dto.title(), dto.author(), dto.isbn(), dto.price(), dto.status());
-        books.put(id, persisted);
-        return persisted;
-    }
-
-    public Optional<BookDto> update(Long id, BookDto dto) {
-        if (!books.containsKey(id)) {
-            return Optional.empty();
-        }
-        BookDto updated = new BookDto(
-                id, dto.title(), dto.author(), dto.isbn(), dto.price(), dto.status());
-        books.put(id, updated);
-        return Optional.of(updated);
-    }
-
-    public boolean delete(Long id) {
-        return books.remove(id) != null;
-    }
-
-    public int size() {
-        return books.size();
-    }
+    @Transactional(readOnly = true)
     public Page<BookDto> findAll(Pageable pageable) {
-        List<BookDto> all = new ArrayList<>(books.values());
-        all.sort(Comparator.comparing(BookDto::title));
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), all.size());
-
-        if (start > all.size()) {
-            return new PageImpl<>(List.of(), pageable, all.size());
-        }
-
-        return new PageImpl<>(all.subList(start, end), pageable, all.size());
+        return repository.findAll(pageable).map(this::toDto);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<BookDto> findById(Long id) {
+        return repository.findById(id).map(this::toDto);
+    }
+
+    @Transactional(readOnly = true)
     public List<BookDto> search(String title, String author, BookStatus status) {
-        return books.values().stream()
-                .filter(b -> title == null || b.title().toLowerCase().contains(title.toLowerCase()))
-                .filter(b -> author == null || b.author().toLowerCase().contains(author.toLowerCase()))
-                .filter(b -> status == null || b.status() == status)
-                .sorted(Comparator.comparing(BookDto::title))
-                .toList();
+        if (title != null && !title.isBlank()) {
+            return repository.findByTitleContainingIgnoreCase(title)
+                    .stream().map(this::toDto).toList();
+        }
+        if (author != null && !author.isBlank()) {
+            return repository.findByAuthorContainingIgnoreCase(author)
+                    .stream().map(this::toDto).toList();
+        }
+        if (status != null) {
+            return repository.findByStatus(status)
+                    .stream().map(this::toDto).toList();
+        }
+        return repository.findAll().stream().map(this::toDto).toList();
+    }
+
+    @Transactional
+    public BookDto create(BookDto dto) {
+        if (repository.existsByIsbn(dto.isbn().value())) {
+            throw new IllegalArgumentException(
+                    "Book with ISBN " + dto.isbn().value() + " already exists");
+        }
+
+        Book entity = new Book(
+                dto.title(),
+                dto.author(),
+                dto.isbn().value(),
+                dto.price().amount(),
+                dto.price().currency().getCurrencyCode(),
+                dto.status()
+        );
+
+        Book saved = repository.save(entity);
+        return toDto(saved);
+    }
+
+    @Transactional
+    public Optional<BookDto> update(Long id, BookDto dto) {
+        return repository.findById(id).map(entity -> {
+            entity.setTitle(dto.title());
+            entity.setAuthor(dto.author());
+            entity.setStatus(dto.status());
+            entity.setPrice(
+                    dto.price().amount(),
+                    dto.price().currency().getCurrencyCode()
+            );
+            return toDto(entity);
+        });
+    }
+
+    @Transactional
+    public boolean delete(Long id) {
+        if (!repository.existsById(id)) {
+            return false;
+        }
+        repository.deleteById(id);
+        return true;
+    }
+
+    @Transactional(readOnly = true)
+    public int size() {
+        return (int) repository.count();
+    }
+
+    private BookDto toDto(Book entity) {
+        return new BookDto(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getAuthor(),
+                new Isbn(entity.getIsbn()),
+                new Money(
+                        entity.getPriceAmount(),
+                        Currency.getInstance(entity.getPriceCurrency())
+                ),
+                entity.getStatus()
+        );
     }
 }

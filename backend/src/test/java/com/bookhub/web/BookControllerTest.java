@@ -1,7 +1,7 @@
 package com.bookhub.web;
 
 import com.bookhub.book.BookDto;
-import com.bookhub.book.BookService;
+import com.bookhub.book.OldBookService;
 import com.bookhub.book.BookStatus;
 import com.bookhub.shared.domain.Isbn;
 import com.bookhub.shared.domain.Money;
@@ -69,7 +69,7 @@ class BookControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private BookService service;
+    private OldBookService service;
 
 
     @MockBean

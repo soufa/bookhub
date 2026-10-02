@@ -2,7 +2,7 @@ package com.bookhub.web;
 
 import com.bookhub.book.BookDto;
 import com.bookhub.book.BookNotFoundException;
-import com.bookhub.book.BookService;
+import com.bookhub.book.OldBookService;
 import com.bookhub.book.BookStatus;
 import com.bookhub.web.dto.BookMapper;
 import com.bookhub.web.dto.BookResponse;
@@ -21,10 +21,10 @@ import java.util.List;
 @RequestMapping("/api/books")
 public class BookController {
 
-    private final BookService service;
+    private final OldBookService service;
     private final BookMapper mapper;
 
-    public BookController(BookService service, BookMapper mapper) {
+    public BookController(OldBookService service, BookMapper mapper) {
         this.service = service;
         this.mapper = mapper;
     }
