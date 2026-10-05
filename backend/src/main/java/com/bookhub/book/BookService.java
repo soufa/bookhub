@@ -2,6 +2,7 @@ package com.bookhub.book;
 
 import com.bookhub.shared.domain.Isbn;
 import com.bookhub.shared.domain.Money;
+import com.bookhub.web.dto.BookWithAuthorDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -106,6 +107,30 @@ public class BookService {
                         Currency.getInstance(entity.getPriceCurrency())
                 ),
                 entity.getStatus()
+        );
+    }
+
+    public Page<BookWithAuthorDto> findAllWithAuthors(Pageable pageable) {
+        return repository.findAllWithAuthor(pageable).map(this::toWithAuthorDto);
+    }
+
+    public List<BookWithAuthorDto> findAllWithAuthorsFetchJoin() {
+        return repository.findAllWithAuthorFetchJoin().stream()
+                .map(this::toWithAuthorDto).toList();
+    }
+
+    private BookWithAuthorDto toWithAuthorDto(Book entity) {
+        String authorName = entity.getAuthorEntity() != null ? entity.getAuthorEntity().getName() : entity.getAuthor();
+        String nationality = entity.getAuthorEntity() != null ? entity.getAuthorEntity().getNationality() : null;
+
+        return new BookWithAuthorDto(
+                entity.getId(),
+                entity.getTitle(),
+                new Isbn(entity.getIsbn()),
+                new Money(entity.getPriceAmount(), java.util.Currency.getInstance(entity.getPriceCurrency())),
+                entity.getStatus(),
+                authorName,
+                nationality
         );
     }
 }
