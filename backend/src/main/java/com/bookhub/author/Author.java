@@ -27,9 +27,6 @@ public class Author {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id")
-    private Author authorEntity;
 
     protected Author() {}
 
@@ -61,6 +58,5 @@ public class Author {
     public void setName(String name) { this.name = name; }
     public void setNationality(String nationality) { this.nationality = nationality; }
     public void setBirthYear(Integer birthYear) { this.birthYear = birthYear; }
-    public Author getAuthorEntity() { return authorEntity; }
-    public void setAuthorEntity(Author authorEntity) { this.authorEntity = authorEntity; }
+
 }
