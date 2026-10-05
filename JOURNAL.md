@@ -283,4 +283,38 @@ Annotation	Rôle
 ### 🎯 Demain (J14)
 - Testcontainers : tests d'intégration PostgreSQL réel
 - Remplacer H2 par un container Docker
-#####
+
+
+
+---
+
+## Étape 12 — `JOURNAL.md` J14
+
+```markdown
+---
+
+## 2026-10-05 (lundi) — J14
+
+### ✅ Fait
+- Plugin `maven-failsafe-plugin` configuré
+- `AbstractIntegrationTest` : container PostgreSQL singleton
+- `application-it.yml` : profil Testcontainers avec Flyway
+- `BookRepositoryIT` : 3 tests PostgreSQL réel
+- `BookN1IT` : 1 test N+1 sur PostgreSQL
+- **Tests surefire : 86** (H2)
+- **Tests failsafe : 4** (PostgreSQL réel)
+- 8 Q/R entretien (Q102 → Q109) → **total 109**
+
+### 💡 Appris
+- Testcontainers = vraie BDD dans les tests
+- `*Test` (Surefire) vs `*IT` (Failsafe)
+- Pattern singleton : container static + start() au chargement
+- `@DynamicPropertySource` : injection de propriétés dynamiques
+- `withReuse(true)` : réutilisation entre exécutions
+- `MODE=PostgreSQL` H2 reste différent du vrai PostgreSQL
+- GitHub Actions fournit Docker par défaut
+
+### 🎯 Demain (J15)
+- Spring Security : `SecurityFilterChain`
+- `UserDetailsService` + users en mémoire
+- Tests de sécurité (`@WithMockUser`)
