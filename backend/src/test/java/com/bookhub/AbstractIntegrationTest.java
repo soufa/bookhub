@@ -4,18 +4,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-/**
- * Classe de base pour les tests d'intégration.
- * Démarre UN SEUL container PostgreSQL partagé par tous les tests qui étendent cette classe.
- *
- * <p>Le container est "static" : il est démarré une fois pour toute la suite de tests.
- * Pattern singleton manuel recommandé par Testcontainers pour éviter de redémarrer
- * le container à chaque classe de test.</p>
- */
 @SpringBootTest
 @ActiveProfiles("it")
+@Sql(scripts = "/db/clean.sql",
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED))
 public abstract class AbstractIntegrationTest {
 
     static final PostgreSQLContainer<?> POSTGRES =

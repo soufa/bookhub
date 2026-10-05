@@ -318,3 +318,43 @@ Annotation	Rôle
 - Spring Security : `SecurityFilterChain`
 - `UserDetailsService` + users en mémoire
 - Tests de sécurité (`@WithMockUser`)
+
+### 2. `JOURNAL.md` J14
+
+Ajoutez **à la fin** :
+
+```markdown
+---
+
+## 2026-10-05 (lundi) — J14
+
+### ✅ Fait
+- Plugin `maven-failsafe-plugin` + exclusion `*IT` dans Surefire
+- Testcontainers 1.19.7 → **1.21.4** (Docker Engine 29.x incompatible)
+- `AbstractIntegrationTest` : container PostgreSQL singleton + `@Sql` ISOLATED
+- `application-it.yml` : profil Testcontainers avec Flyway (`ddl-auto=validate`)
+- `db/clean.sql` : TRUNCATE books + authors avant chaque test
+- `BookRepositoryIT` : 3 tests PostgreSQL réel
+- `BookN1IT` : 1 test N+1 → **1 requête confirmée**
+
+### 💡 Appris
+- Testcontainers = vraie BDD dans les tests d'intégration
+- Docker Engine 29.x nécessite Testcontainers ≥ 1.20 (API 1.54)
+- `NpipeSocketClientProviderStrategy: Status 400` = client trop vieux
+- `*Test` (Surefire) vs `*IT` (Failsafe)
+- Pattern singleton : container `static` + `start()`
+- `@DynamicPropertySource` : injection dynamique
+- `withReuse(true)` + `@Sql ISOLATED` : nettoyage inter-classes
+- N+1 doit être testé **hors transaction** (sinon invisible)
+- `TransactionTemplate` pour le setup d'un test non-`@Transactional`
+
+### 📊 Métriques
+- Tests surefire : 86
+- Tests failsafe : 4
+- Q/R totales : 110
+
+### 🎯 Demain (J15)
+- Spring Security : `SecurityFilterChain`
+- `UserDetailsService` + users en mémoire
+- Tests (`@WithMockUser`)
+- Q111 → Q116
