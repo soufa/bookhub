@@ -420,8 +420,38 @@ Ajoutez **à la fin** :
 - Total : 110
 - Q/R : 125
 
-### 🎯 Demain (J17)
-- Refresh token (access court + refresh long)
-- Endpoint `POST /api/auth/refresh`
-- Tests du refresh (valide, expiré, révoqué)
-- Début Docker (Dockerfile Spring Boot multi-stage)
+---
+
+## 2026-10-07 (mercredi) — J17
+
+### ✅ Fait
+- Migration Flyway V4 : table `refresh_tokens`
+- Entité `RefreshToken` + `RefreshTokenRepository`
+- `RefreshTokenService` : create, rotate, revoke
+- Endpoints : POST `/api/auth/refresh`, POST `/api/auth/logout`
+- Rotation + révocation globale en cas de réutilisation
+- 4 tests E2E refresh (rotation, inconnu, réutilisation, logout)
+- **Tests : 114 verts** (102 Surefire + 12 Failsafe)
+
+### 💡 Appris (4 pièges vécus)
+1. `@AutoConfigureMockMvc` **doit être sur la classe parente** — sur la sous-classe ne suffit pas
+2. Contexte Spring Test partagé entre IT → bug login (401)
+3. `@DirtiesContext(BEFORE_EACH_TEST_METHOD)` : workaround efficace
+4. `LoginResponse` doit avoir `type: "Bearer"` (RFC 6750)
+5. `@Bean static` sur `PasswordEncoder` = anti-pattern
+
+### ⚠️ Dette technique (à traiter en J18)
+- `RefreshTokenEndToEndIT` : `@DirtiesContext(BEFORE_EACH)` à investiguer
+- Probable : cache de contexte Spring Test + `AppUserDetailsService`
+- PasswordConfig séparé : à refactorer proprement
+
+### 📊 Métriques
+- Tests Surefire : 102
+- Tests Failsafe : 12
+- Q/R : 132
+
+### 🎯 Demain (J18)
+- docker-compose complet (backend + PostgreSQL + Adminer)
+- Déploiement local en 1 commande
+- Nettoyage du workaround `@DirtiesContext`
+- Dockerfile test + première image

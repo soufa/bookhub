@@ -1431,3 +1431,91 @@ public static PasswordEncoder passwordEncoder() {
 
 **Piège** : si tous les tests désactivent la sécurité (`addFilters = false`), un bug de config n'est jamais détecté.
 
+---
+
+## Refresh Token & Docker (J17)
+
+### Q126. Pourquoi séparer access token et refresh token ?
+
+**R courte** :
+- **Access token** : court (15 min) — envoyé à chaque requête
+- **Refresh token** : long (7 j) — envoyé uniquement pour renouveler
+
+**Avantage** : si l'access token est volé, il expire vite. Le refresh token peut être révoqué.
+
+**Piège** : sans refresh token, soit on accepte des access tokens de 24h (dangereux), soit on force l'utilisateur à se reconnecter souvent.
+
+---
+
+### Q127. Qu'est-ce que la rotation de refresh token ?
+
+**R courte** : à chaque usage, le refresh token est **révoqué** et un nouveau est émis.
+
+**Objectif** : détecter un vol. Si l'ancien est réutilisé → révocation globale de tous les tokens de l'utilisateur.
+
+**Vécu** : test `should_reject_reused_revoked_token_and_revoke_all_user_tokens` — réutilisation → 401 + révocation de tous les tokens de l'utilisateur.
+
+---
+
+### Q128. Pourquoi stocker le refresh token en DB ?
+
+**R courte** : un access token stateless ne peut pas être révoqué. Un refresh token **stateful** (en DB) peut :
+- être révoqué à la demande (logout)
+- être expiré côté serveur
+- être invalidé en cas de vol détecté
+
+**Piège** : coût en I/O DB à chaque refresh.
+
+---
+
+### Q127. Différence entre `@Modifying` et `@Transactional` sur un repository ?
+
+**R courte** :
+- `@Modifying` : indique à Spring Data JPA qu'une `@Query` modifie les données (UPDATE/DELETE)
+- `@Transactional` : gère la transaction
+
+**Règle** : toujours combiner les deux sur une `@Query` de modification.
+
+---
+
+### Q129. Comment tester la rotation du refresh token ?
+
+**R courte** :
+1. Login → obtenir `refresh1`
+2. Utiliser `refresh1` → obtenir `refresh2` (et `refresh1` est révoqué)
+3. Réutiliser `refresh1` → 401
+4. Utiliser `refresh2` → OK
+
+**Anti-pattern** : ne tester que le happy path.
+
+---
+
+### Q130. `UUID.randomUUID()` vs `SecureRandom` pour un refresh token ?
+
+**R courte** : `UUID.randomUUID()` utilise un `SecureRandom` en interne → cryptographiquement sûr.
+
+**Pour un token très sensible** : `SecureRandom` + Base64 (plus de bits d'entropie).
+
+**Piège** : ne jamais utiliser `Math.random()` pour un token de sécurité.
+
+---
+
+### Q131. Dockerfile multi-stage — pourquoi ?
+
+**R courte** :
+- **Étape 1 (build)** : Maven + JDK (~600 Mo) → produit un `.jar`
+- **Étape 2 (runtime)** : JRE alpine (~150 Mo) + le jar
+
+**Avantage** : image finale 4× plus petite, pas d'outils de build en prod.
+
+**Piège** : ne jamais mettre le JDK complet en runtime — inutile et attaque possible via outils de compilation.
+
+---
+
+### Q132. Pourquoi `-XX:+UseZGC` dans le Dockerfile ?
+
+**R courte** : ZGC = Garbage Collector à très faible pause (< 10 ms) → idéal pour une API REST avec contraintes de latence.
+
+**Alternative** : G1GC (défaut) — équilibré, plus classique.
+
+**Piège** : ZGC consomme ~20 % de RAM en plus. Sur un petit container (512 Mo), préférer G1.

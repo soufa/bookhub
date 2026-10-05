@@ -45,5 +45,6 @@ logging:
 # ⬇️ BLOC DÉPLACÉ À LA RACINE (0 espace d'indentation)
 app:
   jwt:
-    secret: "bookhub-secret-key-please-change-in-production-min-32-characters-long"
+    secret: "test-secret-0123456789abcdef0123456789abcdef0123456789abcdef"
     expiration-ms: 3600000
+    refresh-expiration-days: 7

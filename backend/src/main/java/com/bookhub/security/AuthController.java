@@ -2,10 +2,13 @@ package com.bookhub.security;
 
 import com.bookhub.security.dto.LoginRequest;
 import com.bookhub.security.dto.LoginResponse;
+import com.bookhub.security.dto.RefreshRequest;
+import com.bookhub.security.dto.RefreshResponse;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,25 +17,49 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthenticationManager authManager;
-    private final AppUserDetailsService userDetailsService;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     public AuthController(AuthenticationManager authManager,
-                          AppUserDetailsService userDetailsService,
-                          JwtService jwtService) {
+                          JwtService jwtService,
+                          RefreshTokenService refreshTokenService) {
         this.authManager = authManager;
-        this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest req) {
-        authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.username(), req.password()));
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
+        Authentication auth = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.username(), request.password())
+        );
 
-        UserDetails user = userDetailsService.loadUserByUsername(req.username());
-        String token = jwtService.generateToken(user);
+        UserDetails user = (UserDetails) auth.getPrincipal();
+        String accessToken  = jwtService.generateToken(user);
+        String refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
 
-        return ResponseEntity.ok(new LoginResponse(token, user.getUsername()));
+        return new LoginResponse(accessToken, refreshToken, user.getUsername());
+    }
+
+    @PostMapping("/refresh")
+    public RefreshResponse refresh(@Valid @RequestBody RefreshRequest request) {
+        RefreshTokenService.TokenPair pair = refreshTokenService.rotate(request.refreshToken());
+        return new RefreshResponse(pair.accessToken(), pair.refreshToken());
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@Valid @RequestBody RefreshRequest request) {
+        refreshTokenService.revoke(request.refreshToken());
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public java.util.Map<String, Object> handleInvalidRefresh(InvalidRefreshTokenException ex) {
+        return java.util.Map.of(
+                "status", 401,
+                "error", "Unauthorized",
+                "message", ex.getMessage()
+        );
     }
 }
