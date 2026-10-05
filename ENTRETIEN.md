@@ -11,14 +11,14 @@ Format :
 
 ---
 
-## Java — Records
+## **java** — Records
 
-### Q 1. Qu'est-ce qu'un record Java ?
+### Q 1. Qu'est-ce qu'un record **java** ?
 
-**R courte** : Type immuable introduit en Java 16. Génère automatiquement constructeur canonique, accesseurs, equals, hashCode, toString.
+**R courte** : Type immuable introduit en **java** 16. Génère automatiquement constructeur canonique, accesseurs, equals, hashCode, toString.
 
 Exemple :
-\\\java
+\\\**java**
 public record Isbn(String value) {
     public Isbn {
         if (value == null || value.isBlank())
@@ -44,13 +44,13 @@ Piège : un record ne peut pas étendre une classe.
 **R courte** : Oui.
 
 Exemple :
-\\\java
+\\\**java**
 public record PageResult<T>(List<T> content, int page, int size, long total) {}
 \\\
 
 ---
 
-## Java — Optional
+## **java** — Optional
 
 ### Q 4. Quand utiliser Optional ?
 
@@ -65,16 +65,16 @@ Piège : Optional.get() sans isPresent() est un anti-pattern.
 **R courte** : orElse(value) évalue toujours l'argument. orElseGet(supplier) évalue seulement si vide.
 
 
-## Java — Records avancés & sealed
+## **java** — Records avancés & sealed
 
 
 
 #### Q6. Qu'est-ce que le pattern matching instanceof ?
-**R courte** : Introduit en Java 16. Permet de tester et caster en une seule expression, avec une variable de pattern scopée au bloc où le test est vrai.
+**R courte** : Introduit en **java** 16. Permet de tester et caster en une seule expression, avec une variable de pattern scopée au bloc où le test est vrai.
 
 Exemple :
 
-java
+**java**
 if (obj instanceof String s) {
     System.out.println(s.length());
 }
@@ -84,11 +84,11 @@ Vécu : (à remplir)
 
 
 #### Q7. Switch expression vs switch statement ?
-**R courte** : Switch expression (Java 14) renvoie une valeur et vérifie l'exhaustivité. Pas de break, pas de fall-through avec ->.
+**R courte** : Switch expression (**java** 14) renvoie une valeur et vérifie l'exhaustivité. Pas de break, pas de fall-through avec ->.
 
 Exemple :
 
-java
+**java**
 String label = switch (day) {
     case MONDAY, FRIDAY -> "Travail";
     case SATURDAY, SUNDAY -> "Weekend";
@@ -100,11 +100,11 @@ Vécu : (à remplir)
 
 
 #### Q8. Qu'est-ce qu'une sealed interface ?
-**R courte** : Hiérarchie fermée (Java 17). Seuls les types listés dans permits peuvent implémenter.
+**R courte** : Hiérarchie fermée (**java** 17). Seuls les types listés dans permits peuvent implémenter.
 
 Exemple :
 
-java
+**java**
 public sealed interface Shape permits Circle, Rectangle {}
 Piège : le compilateur peut vérifier l'exhaustivité des switch, sans default.
 
@@ -123,7 +123,7 @@ Vécu : (à remplir)
 
 **Exemple** :
 
-java
+**java**
 public Isbn {
     Objects.requireNonNull(value);
     value = value.replaceAll("-", "");
@@ -148,7 +148,7 @@ Vécu : (à remplir)
 
 Exemple :
 
-java
+**java**
 public record Email(String value) {}
 Piège : un record à un composant n'est pas un wrapper — c'est un type à part entière.
 
@@ -164,7 +164,7 @@ Alternative : utiliser un record pour les DTO, une classe pour les entités.
 Piège : depuis Hibernate 6.2, on peut utiliser des records dans les projections JPQL, mais pas comme entités.
 }
 
-## Java — Records (suite) & divers
+## **java** — Records (suite) & divers
 
 ### Q 14. Quand utiliser `Objects.requireNonNull` ?
 
@@ -184,7 +184,7 @@ List.of() est immuable (refuse null). Arrays.asList() est de taille fixe mais pe
 
 **Exemple**:
 
-**java**
+****java****
 List<String> immutable = List.of("a", "b");     // set() → UnsupportedOperationException
 List<String> fixed = Arrays.asList("a", "b");   // set() OK, add() → UnsupportedOperationException
 **Piège** 
@@ -248,18 +248,18 @@ public int hashCode() {
     return Objects.hash(email, name);   // ✅ propre
 }
 **Piege**
-depuis Java 16+, les record génèrent automatiquement equals/hashCode. Ne les redéfinir que si nécessaire
+depuis **java** 16+, les record génèrent automatiquement equals/hashCode. Ne les redéfinir que si nécessaire
 
 ---
 
-## Java — Enums & sealed
+## **java** — Enums & sealed
 
-### Q 22. Qu'est-ce qu'un enum Java ?
+### Q 22. Qu'est-ce qu'un enum **java** ?
 
 **R courte** : Type spécial qui représente un ensemble fini et fixe de constantes. Ce sont des classes à part entière : elles peuvent avoir des champs, des constructeurs, des méthodes.
 
 **Exemple** :
-***java***
+*****java*****
 public enum BookStatus {
     AVAILABLE("Available"),
     BORROWED("Currently borrowed");
@@ -277,11 +277,11 @@ public enum BookStatus {
 **Piege** : un enum peut être utilisé dans un switch (exhaustivité vérifiée). Les constantes String ne le permettent pas.
 
 ### Q 24. Qu'est-ce qu'une sealed interface ?
-**R courte** : Interface qui restreint les types qui peuvent l'implémenter. Introduite en Java 17 (final). Hiérarchie fermée, exhaustivité au compilateur.
+**R courte** : Interface qui restreint les types qui peuvent l'implémenter. Introduite en **java** 17 (final). Hiérarchie fermée, exhaustivité au compilateur.
 
 **Exemple** :
 
-java
+**java**
 public sealed interface Shape permits Circle, Rectangle {}
 
 **Piège** : les sous-types doivent être dans le même module ou le même package (si module-less).
@@ -302,7 +302,7 @@ non-sealed : extension libre (désactive le sceau pour un sous-type)
 
 **Exemple** :
 
-java
+**java**
 public record BookDto(Long id, String title) {}
 
 **Piège** : un record n'est pas adapté aux entités JPA (Hibernate a besoin de proxyfié, et un record est final).
@@ -316,11 +316,11 @@ public record BookDto(Long id, String title) {}
 
 ### Q 28. Qu'est-ce que le pattern matching instanceof ?
 
-**R courte** : Java 16+. Permet de tester et caster en une seule expression, avec une variable scopée au bloc où le test est vrai.
+**R courte** : **java** 16+. Permet de tester et caster en une seule expression, avec une variable scopée au bloc où le test est vrai.
 
 **Exemple** :
 
-java
+**java**
 if (notification instanceof EmailNotification email) {
     System.out.println(email.email());
 }
@@ -328,11 +328,11 @@ if (notification instanceof EmailNotification email) {
 
 ###Q 29. Switch expression sur enum ?
 
-**R courte** : Depuis Java 14, un switch peut être une expression qui renvoie une valeur. Sur un enum, le compilateur vérifie l'exhaustivité (pas besoin de default).
+**R courte** : Depuis **java** 14, un switch peut être une expression qui renvoie une valeur. Sur un enum, le compilateur vérifie l'exhaustivité (pas besoin de default).
 
 **Exemple** :
 
-java
+**java**
 String label = switch (status) {
     case AVAILABLE -> "Dispo";
     case BORROWED -> "Emprunté";
@@ -344,7 +344,7 @@ String label = switch (status) {
 
 ---
 
-## Java — Collections
+## **java** — Collections
 
 ### Q30. Différence entre `ArrayList` et `LinkedList` ?
 
@@ -381,7 +381,7 @@ String label = switch (status) {
 **R courte** : Levée par les itérateurs fail-fast (`ArrayList`, `HashMap`) quand la collection est modifiée pendant l'itération.
 
 **Exemple** :
-java
+**java**
 for (String s : list) if (s.isEmpty()) list.remove(s); // ❌ CME
 list.removeIf(String::isEmpty);                          // ✅
 
@@ -406,12 +406,12 @@ Piège : peek() renvoie le plus petit (ou plus grand selon le comparator), mais 
 
 
 ### Q37. Comment rendre une collection immuable ?
-**R courte** : List.copyOf(), Set.copyOf(), Map.copyOf() (Java 10+) → copie défensive + immuable. Refuse null.
+**R courte** : List.copyOf(), Set.copyOf(), Map.copyOf() (**java** 10+) → copie défensive + immuable. Refuse null.
 
 **Piège** : Collections.unmodifiableList() est une vue — si la liste source change, la vue change aussi. Pas une copie.
 
 
-## Java — Streams & Lambda
+## **java** — Streams & Lambda
 
 ### Q38. Différence entre `map` et `flatMap` ?
 
@@ -441,7 +441,7 @@ Piège : si vous écrivez map et obtenez un Stream<Stream<...>>, c'est flatMap q
 
 **Exemple** :
 
-java
+**java**
 Stream.of(1, 2, 3).filter(x -> { System.out.println(x); return true; });
 // Rien ne s'affiche : pas d'opération terminale
 **Piège** : oublier l'opération terminale = pipeline jamais exécuté, aucune erreur.
@@ -452,7 +452,7 @@ Stream.of(1, 2, 3).filter(x -> { System.out.println(x); return true; });
 
 **Exemple** :
 
-java
+**java**
 .collect(Collectors.toMap(
     Book::isbn,
     Book::title,
@@ -465,7 +465,7 @@ java
 
 **Exemple** :
 
-java
+**java**
 Map<String, Long> countByAuthor = books.stream()
     .collect(Collectors.groupingBy(
         Book::author,
@@ -478,7 +478,7 @@ Map<String, Long> countByAuthor = books.stream()
 
 **Exemple** :
 
-java
+**java**
 // ❌ Anti-pattern
 stream.map(x -> { counter.incrementAndGet(); return x * 2; });
 
@@ -531,7 +531,7 @@ Champ : à éviter (impossible à tester sans Spring, masque les dépendances)
 
 **Exemple** :
 
-java
+**java**
 // ✅ Constructeur
 public BookService(BookRepository repo) { this.repo = repo; }
 
@@ -555,7 +555,7 @@ Quand utiliser @Bean : quand vous ne pouvez pas annoter la classe (ex: Clock, St
 
 **Exemple* :
 
-java
+**java**
 @Value("${bookhub.greeting.message:Hello}")
 private String message;
 **Piège** : syntaxe ${clé:valeur_par_défaut}. Sans valeur par défaut, si la clé est absente → IllegalArgumentException au démarrage.
@@ -570,7 +570,7 @@ private String message;
 
 Utile pour : ouvrir/fermer des ressources, initialiser des caches, logger le démarrage.
 
-**Piège** : en Java 17, ces annotations viennent de jakarta.annotation (avant : javax.annotation).
+**Piège** : en **java** 17, ces annotations viennent de jakarta.annotation (avant : **java**x.annotation).
 
 ### Q52. Qu'est-ce qu'un bean singleton par défaut ?
 **R courte** : Un bean Spring est singleton par défaut : une seule instance partagée par toute l'application.
@@ -584,7 +584,7 @@ Utile pour : ouvrir/fermer des ressources, initialiser des caches, logger le dé
 
 **Exemple** :
 
-java
+**java**
 ApplicationContext ctx = new AnnotationConfigApplicationContext(AppConfig.class);
 GreetingService service = ctx.getBean(GreetingService.class);
 **Piège** : en Spring Boot, l'ApplicationContext est créé automatiquement par SpringApplication.run(). On n'a pas besoin de l'instancier à la main.
@@ -621,7 +621,7 @@ public List<Book> list(@RequestParam String status) { ... }
 
 **Exemple** :
 
-java
+**java**
 return ResponseEntity
     .created(URI.create("/api/books/" + id))
     .body(createdBook);
@@ -632,7 +632,7 @@ return ResponseEntity
 
 **Exemple** :
 
-java
+**java**
 @PostMapping
 public Book create(@Valid @RequestBody BookDto dto) { ... }
 **Piège** : sans @Valid, les validations ne s'exécutent pas. @Valid à mettre avant @RequestBody.
@@ -642,7 +642,7 @@ public Book create(@Valid @RequestBody BookDto dto) { ... }
 
 **Exemple** :
 
-java
+**java**
 @RestController
 @RequestMapping("/api/books")   // base URL
 public class BookController {
@@ -656,7 +656,7 @@ public class BookController {
 
 **Exemple** :
 
-java
+**java**
 return ResponseEntity
     .created(URI.create("/api/books/" + id))
     .body(book);
@@ -668,7 +668,7 @@ return ResponseEntity
 
 **Exemple** :
 
-java
+**java**
 @WebMvcTest(BookController.class)
 class BookControllerTest {
     @Autowired MockMvc mockMvc;
@@ -681,11 +681,11 @@ class BookControllerTest {
 **Piège** : @WebMvcTest ne charge pas les autres couches (services, repositories). Il faut @MockBean pour les dépendances.
 
 ### Q61. Que fait @RequestBody ?
-**R courte** : Désérialise le body HTTP (JSON) en objet Java, via Jackson.
+**R courte** : Désérialise le body HTTP (JSON) en objet **java**, via Jackson.
 
 **Exemple** :
 
-java
+**java**
 @PostMapping
 public Book create(@RequestBody BookDto dto) { ... }
 **Piège** : si le JSON est mal formé → HttpMessageNotReadableException → code 400. Sans @RequestBody, Spring ne peut pas mapper le body.
@@ -697,7 +697,7 @@ public Book create(@RequestBody BookDto dto) { ... }
 **R courte** : Injecter `Pageable` en paramètre, utiliser `@PageableDefault` pour les valeurs par défaut. Spring construit automatiquement le `Pageable` depuis `?page=0&size=10&sort=title`.
 
 **Exemple** 
-**java**
+****java****
 @GetMapping
 public Page<BookDto> listAll(@PageableDefault(size = 10, sort = "title") Pageable pageable) {
     return service.findAll(pageable);
@@ -722,7 +722,7 @@ Page<T> : + total d'éléments, total de pages
 
 **Exemple** :
 
-java
+**java**
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(BookNotFoundException.class)
@@ -756,7 +756,7 @@ Lever une exception dès que la logique métier ne peut pas continuer. Le handle
 
 **Exemple** :
 
-java
+**java**
 @PostMapping
 public Book create(@Valid @RequestBody BookDto dto) { ... }
 **Piège** : sans @Valid, les annotations sont ignorées. @Valid avant @RequestBody.
@@ -795,7 +795,7 @@ GET /api/books?page=0&size=10&sort=author,asc&sort=title,asc
 **R courte** : Annotations Bean Validation (`@NotBlank`, `@Size`, `@Positive`) + `@Valid` sur le paramètre du controller.
 
 **Exemple** :
-**java**
+****java****
 public record CreateBookRequest(
     @NotBlank String title,
     @Positive BigDecimal price
@@ -833,3 +833,218 @@ public BookResponse create(@Valid @RequestBody CreateBookRequest request) { ... 
 
 ### Q77. Différence entre test unitaire et test d'intégration ?
 **R courte** : Unitaire = une classe isolée (mock). Intégration = plusieurs couches (controller + service + BDD). Ratio recommandé : 80 % unitaires / 20 % intégration.
+
+---
+
+## Spring — JPA
+
+### Q78. Qu'est-ce que JPA ?
+
+**R courte** : JPA (Jakarta Persistence API) est une **spécification** pour la persistance objet-relationnel (ORM). Hibernate est l'implémentation la plus utilisée.
+
+**Piège** : JPA ≠ Hibernate. JPA est l'API standard, Hibernate l'implémentation. Utiliser JPA permet la portabilité (passer à EclipseLink sans réécrire).
+
+**Vécu** : (à remplir)
+
+---
+
+### Q79. Différence entre `@Entity` et `@Table` ?
+
+**R courte** : `@Entity` marque la classe comme entité persistée. `@Table(name = "books")` configure le nom de la table.
+
+**Exemple** :
+@Entity
+@Table(name = "books")
+public class Book { ... }
+
+### Q80. @GeneratedValue — stratégies ?
+**R courte** :
+
+IDENTITY : auto-increment BDD (PostgreSQL SERIAL)
+
+SEQUENCE : utilise une séquence (recommandé PostgreSQL)
+
+AUTO : laisse Hibernate choisir
+
+TABLE : table dédiée (lent, à éviter)
+
+**Exemple** :
+
+**java**
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
+**Piège** : IDENTITY ne permet pas le batching JDBC (moins performant pour les INSERT massifs). Préférer SEQUENCE pour les gros volumes.
+
+### Q81. @Enumerated — STRING vs ORDINAL ?
+**R courte** : EnumType.STRING stocke "AVAILABLE". ORDINAL stocke la position (0).
+
+**Exemple** :
+
+**java**
+@Enumerated(EnumType.STRING)
+private BookStatus status;
+**Piège** : toujours préférer STRING. Réordonner un enum avec ORDINAL casse les données existantes (les entiers ne correspondent plus).
+
+### Q82. Comment fonctionne JpaRepository ?
+**R courte** : Spring Data génère l'implémentation à la compilation. CRUD fourni gratuitement. Les requêtes dérivées (findByIsbn, existsByTitle) sont parsées depuis le nom de la méthode.
+
+**Exemple** :
+
+**java**
+public interface BookRepository extends JpaRepository<Book, Long> {
+    Optional<Book> findByIsbn(String isbn);
+    boolean existsByIsbn(String isbn);
+    List<Book> findByAuthorContainingIgnoreCase(String author);
+}
+**Piège** : respecter la convention findBy<Property>, existsBy<Property>. Sinon erreur au démarrage de Spring.
+
+### Q83. Qu'est-ce que @Transactional ?
+**R courte** : Démarre une transaction autour de la méthode. Rollback automatique sur exception unchecked (RuntimeException). readOnly = true optimise les lectures (pas de dirty checking).
+
+**Exemple** :
+
+**java**
+@Service
+public class BookService {
+    @Transactional(readOnly = true)
+    public Optional<BookDto> findById(Long id) { ... }
+
+    @Transactional
+    public BookDto create(BookDto dto) { ... }
+}
+**Piège** : les appels internes (this.method()) ne déclenchent pas la transaction. Spring utilise un proxy — l'appel doit venir de l'extérieur du bean.
+
+### Q84. À quoi servent @PrePersist et @PreUpdate ?
+**R courte** : Callbacks JPA appelés avant l'insertion (@PrePersist) ou la mise à jour (@PreUpdate). Utiles pour timestamps, audit, valeurs par défaut.
+
+**Exemple** :
+
+**java**
+@PrePersist
+void onCreate() {
+    Instant now = Instant.now();
+    this.createdAt = now;
+    this.updatedAt = now;
+}
+
+@PreUpdate
+void onUpdate() {
+    this.updatedAt = Instant.now();
+}
+**Piège** : si un champ est nullable = false, il doit être rempli dans @PrePersist, sinon erreur à l'INSERT.
+
+### Q85. Pourquoi un constructeur protected Book() {} ?
+**R courte** : JPA a besoin d'un constructeur sans arguments pour créer des proxies et instancier les entités au chargement depuis la BDD.
+
+**Exemple** :
+
+**java**
+@Entity
+public class Book {
+    protected Book() {}  // requis par JPA
+
+    public Book(String title, ...) { ... }
+}
+**Piège** : protected suffit et empêche l'instanciation accidentelle par le code métier. public serait trop permissif.
+
+### ---
+
+## Spring — JPA Relations
+
+### Q86. Différence entre `@ManyToOne` et `@OneToMany` ?
+
+**R courte** : `@ManyToOne` = plusieurs A pointent vers 1 B (côté propriétaire, porte la FK). `@OneToMany` = 1 A contient plusieurs B (côté inverse).
+
+**Exemple** :
+****java****
+// Book (ManyToOne) — côté propriétaire
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "author_id")
+private Author author;
+
+// Author (OneToMany) — côté inverse
+@OneToMany(mappedBy = "author")
+private List<Book> books = new ArrayList<>();
+
+**Piège** : la FK est dans la table du côté @ManyToOne. mappedBy indique qui possède la relation.
+
+### Q87. Pourquoi toujours mettre fetch = LAZY sur @ManyToOne ?
+**R courte** : Par défaut EAGER → charge Author à chaque lecture de Book → problème N+1.
+
+**Exemples** :
+
+****java****
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "author_id")
+private Author author;
+**Piège** : avec LAZY, appeler book.getAuthor().getName() hors transaction → LazyInitializationException.
+
+
+### Q88. Qu'est-ce que mappedBy ?
+**R courte** : Indique qui possède la relation. Se met sur le côté @OneToMany, valeur = nom du champ côté propriétaire.
+
+**Exemples** :
+
+****java****
+@OneToMany(mappedBy = "author")   // "author" = champ dans Book
+private List<Book> books;
+**Piège** : sans mappedBy, JPA crée une table de jointure intermédiaire (au lieu d'utiliser la FK).
+
+
+### Q89. Cascade JPA — quoi et quand ?
+R courte : Propage une opération du parent vers ses enfants. CascadeType.ALL = tout (PERSIST, MERGE, REMOVE, REFRESH, DETACH).
+
+**Piège** : CascadeType.REMOVE sur @ManyToOne supprime l'auteur quand on supprime un livre — à éviter.
+
+
+### Q90. orphanRemoval = true — à quoi ça sert ?
+**R courte** : Si un enfant est retiré de la collection parente, il est supprimé de la BDD.
+
+**Exemples** :
+
+****java****
+@OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<Book> books;
+**Piège** : à réserver aux relations fortes (Commande → Lignes). Un Book ne doit pas être supprimé parce qu'on retire l'auteur.
+
+### Q91. Que fait @JoinColumn ?
+**R courte**: Nomme la colonne FK sur le côté propriétaire.
+
+**Exemples** :
+
+****java****
+@ManyToOne
+@JoinColumn(name = "author_id", nullable = false)
+private Author author;
+**Piège** : toujours l'expliciter pour lisibilité et migrations Flyway.
+
+
+### Q92. Problème N+1 — qu'est-ce que c'est ?
+**R courte** : Charger N entités + N requêtes pour leurs relations. Ex : 1000 livres → 1 + 1000 requêtes.
+
+**Solution 1 — JOIN FETCH :
+
+****java****
+@Query("SELECT b FROM Book b JOIN FETCH b.author")
+List<Book> findAllWithAuthor();
+**Solution 2 — @EntityGraph :
+
+****java****
+@EntityGraph(attributePaths = "author")
+List<Book> findAll();
+**Piège** : invisible en dev. Toujours vérifier avec show-sql: true.
+
+
+### Q93. CascadeType.ALL — quand l'utiliser ?
+**R courte** : Quand l'enfant ne peut pas exister sans le parent.
+
+**Exemples** :
+
+✅ Commande → Lignes (ALL + orphanRemoval = true)
+
+❌ Book → Author (relation faible)
+
+❌ Article → Auteur
+
+**Piège** : REMOVE sur relation faible = perte de données catastrophique.

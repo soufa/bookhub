@@ -215,3 +215,38 @@ Annotation	Rôle
 - Revoir Spring Core + Web (S2 : J7 → J10)
 - Relire les 77 Q/R
 - Consolider `APPRENTISSAGE.md`
+
+
+---
+
+## Étape 3 — `JOURNAL.md` J12
+
+**Ajoutez à la fin** :
+
+```markdown
+---
+
+## 2026-10-05 (lundi) — J12
+
+### ✅ Fait
+- Migration Flyway `V3` : table `authors` + FK `books.author_id`
+- Entité `Author` avec `@PrePersist` / `@PreUpdate`
+- `AuthorRepository` avec 5 requêtes dérivées
+- Relation `@ManyToOne(fetch = LAZY)` sur `Book.authorEntity`
+- `AuthorRepositoryTest` : 6 tests
+- `BookAuthorRelationTest` : 3 tests
+- **Total tests : 81**
+- 8 Q/R entretien (Q86 → Q93) → **total 93**
+
+### 💡 Appris
+- `@ManyToOne` : côté propriétaire (porte la FK)
+- `@OneToMany(mappedBy)` : côté inverse
+- `fetch = LAZY` obligatoire sur `@ManyToOne` (sinon N+1)
+- `@JoinColumn(name)` : nommer la FK
+- `ON DELETE SET NULL` : garder le livre quand l'auteur est supprimé
+- Cascade + orphanRemoval : uniquement pour relations fortes
+- `@DataJpaTest` + `@ActiveProfiles("test")` : H2 en mémoire
+
+### 🎯 Demain (J13)
+- Problème N+1 : reproduction + correction (`@EntityGraph`, `JOIN FETCH`)
+- `@Transactional` propagation approfondie

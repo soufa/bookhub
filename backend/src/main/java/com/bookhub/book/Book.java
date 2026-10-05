@@ -1,7 +1,10 @@
 package com.bookhub.book;
 
 import jakarta.persistence.*;
-
+import com.bookhub.author.Author;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -60,6 +63,12 @@ public class Book {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    // ⬇️ AJOUTER CE BLOC ICI
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private Author authorEntity;
+
+
     /** Constructeur requis par JPA (proxy). */
     protected Book() {}
 
@@ -104,4 +113,7 @@ public class Book {
         this.priceAmount = amount;
         this.priceCurrency = currency;
     }
+
+    public Author getAuthorEntity() { return authorEntity; }
+    public void setAuthorEntity(Author authorEntity) { this.authorEntity = authorEntity; }
 }
