@@ -250,3 +250,37 @@ Annotation	Rôle
 ### 🎯 Demain (J13)
 - Problème N+1 : reproduction + correction (`@EntityGraph`, `JOIN FETCH`)
 - `@Transactional` propagation approfondie
+
+
+---
+
+## `JOURNAL.md` J13
+
+```markdown
+---
+
+## 2026-10-05 (lundi) — J13
+
+### ✅ Fait
+- `BookWithAuthorDto` : DTO avec auteur
+- `@EntityGraph` sur `findAllWithAuthor(Pageable)`
+- `JOIN FETCH` en JPQL
+- `BookN1Test` : 3 tests de comparaison N+1 (6 vs 2 vs 1 requêtes)
+- `AuditService` : `REQUIRES_NEW` + `MANDATORY`
+- `AuditServiceTest` : 2 tests propagation
+- **Total tests : 86**
+- 8 Q/R entretien (Q94 → Q101) → **total 101**
+
+### 💡 Appris
+- N+1 = 1 requête initiale + N requêtes par relation
+- `@EntityGraph` : marche avec `Pageable`
+- `JOIN FETCH` : 1 requête, mais incompatible `Pageable`
+- `Statistics.getPrepareStatementCount()` : compter les requêtes en test
+- `REQUIRES_NEW` : suspend l'existante, utile pour audit
+- `MANDATORY` : impose une transaction existante
+- Problème du proxy : `this.method()` ne déclenche pas `@Transactional`
+
+### 🎯 Demain (J14)
+- Testcontainers : tests d'intégration PostgreSQL réel
+- Remplacer H2 par un container Docker
+#####
