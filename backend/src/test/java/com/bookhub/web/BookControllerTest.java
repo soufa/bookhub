@@ -3,6 +3,7 @@ package com.bookhub.web;
 import com.bookhub.book.BookDto;
 import com.bookhub.book.OldBookService;
 import com.bookhub.book.BookStatus;
+import com.bookhub.security.JwtAuthenticationFilter;
 import com.bookhub.shared.domain.Isbn;
 import com.bookhub.shared.domain.Money;
 import com.bookhub.web.dto.BookMapper;
@@ -51,7 +52,6 @@ import static org.mockito.ArgumentMatchers.anyList;
  */
 @WebMvcTest(BookController.class)
 @AutoConfigureMockMvc(addFilters = false)   // ← AJOUTER CETTE LIGNE
-
 class BookControllerTest {
     /**
      * @WebMvcTest : charge uniquement la couche web (pas de JPA, pas de BDD)
@@ -74,6 +74,9 @@ class BookControllerTest {
 
     @MockBean
     private BookMapper mapper;
+
+    @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;   // ← AJOUTER
+
 
     //Avant
     private final BookDto sample = new BookDto(1L, "Effective Java", "Joshua Bloch",

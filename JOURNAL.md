@@ -358,3 +358,39 @@ Ajoutez **à la fin** :
 - `UserDetailsService` + users en mémoire
 - Tests (`@WithMockUser`)
 - Q111 → Q116
+
+
+
+### 2. Mettre à jour `JOURNAL.md` (J15)
+
+```markdown
+---
+
+## 2026-10-05 (lundi, après-midi) — J15
+
+### ✅ Fait
+- Dépendances JWT (jjwt 0.12.6)
+- `SecurityConfig` : SecurityFilterChain + STATELESS + HttpStatusEntryPoint
+- `AppUserDetailsService` : users en mémoire (user/user123, admin/admin123)
+- `JwtService` : génération + validation JWT
+- `JwtAuthenticationFilter` : extraction Bearer token
+- `AuthController` : POST /api/auth/login
+- `@PreAuthorize("hasRole('ADMIN')")` sur create/update/delete
+- `@WithMockUser` sur BookIntegrationTest
+- **Tests : 93 verts**
+
+### 💡 Appris (4 bugs réels)
+1. **Cycle de beans** Spring Security → `@Bean public static PasswordEncoder`
+2. **Rôle vide** dans `.roles("")` → filtrer `!r.isBlank()`
+3. **403 en test** sans auth → `@WithMockUser(username="admin", roles="ADMIN")`
+4. **403 vs 401** → `HttpStatusEntryPoint(UNAUTHORIZED)` explicite
+
+### 📊 Métriques
+- Tests : 93
+- Q/R : 118
+
+### 🎯 Demain (J16)
+- Tests JWT end-to-end (vrai login + token)
+- `@WithUserDetails` (vrai UserDetailsService au lieu de mock)
+- Refresh token
+- Handler 401/403 personnalisé

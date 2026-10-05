@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -28,6 +29,8 @@ public class BookController {
         this.service = service;
         this.mapper = mapper;
     }
+
+    // ===== LECTURES (USER + ADMIN) =====
 
     @GetMapping
     public Page<BookResponse> listAll(
@@ -51,7 +54,10 @@ public class BookController {
         return mapper.toResponseList(service.search(title, author, status));
     }
 
+    // ===== ÉCRITURES (ADMIN seulement) =====
+
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookResponse> create(@Valid @RequestBody CreateBookRequest request) {
         BookDto created = service.create(mapper.toDomain(request));
         return ResponseEntity
@@ -60,7 +66,9 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public BookResponse update(@PathVariable Long id, @Valid @RequestBody CreateBookRequest request) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public BookResponse update(@PathVariable Long id,
+                               @Valid @RequestBody CreateBookRequest request) {
         BookDto dto = mapper.toDomain(request);
         return service.update(id, dto)
                 .map(mapper::toResponse)
@@ -68,6 +76,7 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!service.delete(id)) {
             throw new BookNotFoundException(id);

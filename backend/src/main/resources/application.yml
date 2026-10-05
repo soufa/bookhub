@@ -39,5 +39,11 @@ logging:
   level:
     com.bookhub: DEBUG
     org.hibernate.SQL: DEBUG
-    org.springframework.transaction: TRACE        # ← AJOUTER
-    org.springframework.orm.jpa: DEBUG            # ← AJOUTER
+    org.springframework.transaction: TRACE
+    org.springframework.orm.jpa: DEBUG
+
+# ⬇️ BLOC DÉPLACÉ À LA RACINE (0 espace d'indentation)
+app:
+  jwt:
+    secret: "bookhub-secret-key-please-change-in-production-min-32-characters-long"
+    expiration-ms: 3600000
