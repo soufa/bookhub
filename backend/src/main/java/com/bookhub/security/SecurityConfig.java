@@ -23,11 +23,17 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AppUserDetailsService userDetailsService;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,
-                          AppUserDetailsService userDetailsService) {
+                          AppUserDetailsService userDetailsService,
+                          RestAuthenticationEntryPoint restAuthenticationEntryPoint,
+                          RestAccessDeniedHandler restAccessDeniedHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+        this.restAccessDeniedHandler = restAccessDeniedHandler;
     }
 
     // ↓↓ Bean STATIC — créé avant l'instance SecurityConfig → casse le cycle
@@ -51,10 +57,10 @@ public class SecurityConfig {
                 .sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .exceptionHandling(ex -> ex                       // ← AJOUTER
-                        .authenticationEntryPoint(                 // ← AJOUTER
-                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                )                                                  // ← AJOUTER
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(restAuthenticationEntryPoint)
+                        .accessDeniedHandler(restAccessDeniedHandler)
+                )                                                 // ← AJOUTER
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

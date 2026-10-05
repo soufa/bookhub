@@ -1346,3 +1346,88 @@ public static PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
 }
 **Alternatives** : classe @Configuration séparée, @Lazy.	
+
+---
+
+## Spring Security — Tests E2E (J16)
+
+### Q119. `@WithMockUser` vs `@WithUserDetails` ?
+
+**R courte** :
+- `@WithMockUser` : crée un UserDetails fictif — ne passe **pas** par votre `UserDetailsService`
+- `@WithUserDetails` : appelle le **vrai** `UserDetailsService` → teste le mappage réel
+
+**Quand utiliser quoi** :
+- `@WithMockUser` : tests unitaires de controller (rapide, isolé)
+- `@WithUserDetails` : tests d'intégration avec la vraie config de sécurité
+
+**Piège** : `@WithMockUser` ne détecte pas un bug dans `AppUserDetailsService`.
+
+---
+
+### Q120. `AuthenticationEntryPoint` vs `AccessDeniedHandler` ?
+
+**R courte** :
+- **AuthenticationEntryPoint** : utilisateur **non authentifié** → 401
+- **AccessDeniedHandler** : utilisateur **authentifié** mais sans les droits → 403
+
+**Piège** : par défaut Spring renvoie 403 pour les deux. Une API REST doit distinguer.
+
+**Vécu** : 3 tests échouaient en 401 vs 403 → fix par `HttpStatusEntryPoint` puis handlers JSON custom.
+
+---
+
+### Q121. Pourquoi tester le flux complet login → token → endpoint ?
+
+**R courte** : tester les briques séparément ne prouve **pas** que le tout fonctionne. Un test E2E détecte :
+- un filtre mal branché dans la chaîne
+- un token mal extrait du header
+- un `Authentication` non transmis au `SecurityContext`
+
+**Règle** : pour chaque feature critique, au moins 1 test E2E.
+
+---
+
+### Q122. Structure d'un bon test JWT ?
+
+**R courte** : 4 niveaux :
+1. **Unit** : `JwtServiceTest` — génération, parsing, expiration
+2. **Filter** : `JwtAuthenticationFilterTest` — extraction header
+3. **E2E** : login → token → endpoint protégé
+4. **Négatif** : sans token → 401, invalide → 401, mauvais rôle → 403
+
+**Anti-pattern** : ne tester que le happy path.
+
+---
+
+### Q123. Comment tester l'expiration d'un JWT ?
+
+**R courte** : générer un token avec `expirationMs` **négatif** → déjà expiré → `ExpiredJwtException` (ou sa parente `JwtException`).
+
+**Alternative** : `Clock` injectable + `Clock.fixed(...)`.
+
+**Piège** : attendre l'expiration réelle rend le test lent et flaky.
+
+---
+
+### Q124. Taille de clé et algo JWT dans jjwt ?
+
+**R courte** : `Keys.hmacShaKeyFor(bytes)` choisit l'algo selon la taille :
+- **32 octets** → HS256
+- **48 octets** → HS384
+- **64 octets** → HS512
+
+**Piège** : une clé < 32 octets → `WeakKeyException`.
+
+**Vécu** : clé de 64 caractères → header `"alg":"HS512"`, pas `"HS256"`.
+
+---
+
+### Q125. Faut-il tester la sécurité dans chaque controller test ?
+
+**R courte** : non. Deux stratégies :
+- **1 test sécurité dédié** par controller (`BookControllerSecurityTest`)
+- **Tests fonctionnels** avec `@WithMockUser` ou `@WithUserDetails` pour ignorer la sécurité
+
+**Piège** : si tous les tests désactivent la sécurité (`addFilters = false`), un bug de config n'est jamais détecté.
+

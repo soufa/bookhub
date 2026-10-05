@@ -394,3 +394,34 @@ Ajoutez **à la fin** :
 - `@WithUserDetails` (vrai UserDetailsService au lieu de mock)
 - Refresh token
 - Handler 401/403 personnalisé
+
+---
+
+## 2026-10-06 (mardi) — J16
+
+### ✅ Fait
+- `RestAuthenticationEntryPoint` : réponse JSON 401
+- `RestAccessDeniedHandler` : réponse JSON 403
+- `SecurityConfig` : handlers branchés
+- `JwtEndToEndIT` : 4 tests E2E (login → token → endpoint)
+- `JwtServiceTest` : 7 tests unitaires JWT
+- `BookControllerWithUserDetailsTest` : 2 tests avec `@WithUserDetails`
+- **Tests : 110 verts** (102 Surefire + 8 Failsafe)
+
+### 💡 Appris (4 pièges vécus)
+1. **Réflexion sur champ privé** : `secret` → `secretKey` (noms réels)
+2. **`ExpiredJwtException` non résolu dans l'IDE** : utiliser `Exception` ou `JwtException` (classe parente)
+3. **jjwt choisit l'algo selon la taille de clé** : 64 octets → HS512, pas HS256
+4. **`@WithMockUser` vs `@WithUserDetails`** : le second teste le vrai `UserDetailsService`
+
+### 📊 Métriques
+- Tests Surefire : 102
+- Tests Failsafe : 8
+- Total : 110
+- Q/R : 125
+
+### 🎯 Demain (J17)
+- Refresh token (access court + refresh long)
+- Endpoint `POST /api/auth/refresh`
+- Tests du refresh (valide, expiré, révoqué)
+- Début Docker (Dockerfile Spring Boot multi-stage)
