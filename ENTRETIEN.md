@@ -1519,3 +1519,117 @@ public static PasswordEncoder passwordEncoder() {
 **Alternative** : G1GC (défaut) — équilibré, plus classique.
 
 **Piège** : ZGC consomme ~20 % de RAM en plus. Sur un petit container (512 Mo), préférer G1.
+
+---
+
+## Docker Compose & Angular (J18-J19)
+
+### Q141. Différence entre `docker run` et `docker-compose` ?
+
+**R courte** : `docker run` est impératif (une commande par conteneur). `docker-compose` est déclaratif (un YAML décrit tout le stack).
+
+**Avantage Compose** : reproductibilité en 1 commande (`docker-compose up`), réseau automatique, ordre de démarrage.
+
+**Piège** : Compose = dev/staging mono-machine. Pour la prod multi-nœuds → Kubernetes.
+
+---
+
+### Q142. À quoi sert `healthcheck` dans Compose ?
+
+**R courte** : vérifie qu'un conteneur est **réellement prêt** (pas juste démarré).
+
+**Sans healthcheck** : `depends_on` attend seulement que le conteneur existe → le backend démarre avant que PostgreSQL soit prêt → crash `connection refused`.
+
+**Bonne pratique** : `healthcheck` + `depends_on: { condition: service_healthy }`.
+
+---
+
+### Q143. Pourquoi un conteneur parle à `postgres:5432` et pas `localhost:5432` ?
+
+**R courte** : Compose crée un réseau interne avec DNS automatique. **Le nom du service = hostname**.
+
+**Piège** : `localhost` dans un conteneur pointe vers **lui-même**, pas la machine hôte.
+
+---
+
+### Q144. Différence entre `docker-compose down` et `down -v` ?
+
+**R courte** :
+- `down` : arrête et supprime les conteneurs, **garde les volumes**
+- `down -v` : supprime aussi les volumes → **BDD effacée**
+
+**Piège vécu** : après `down -v`, la base PostgreSQL est vide → il faut re-seeder.
+
+---
+
+### Q145. Comment Spring Security gère-t-il `/error` ?
+
+**R courte** : toute erreur interne (400, 500) déclenche un forward vers `/error`. Si `/error` n'est pas `permitAll`, Spring Security le bloque → renvoie **401 au lieu du vrai code**.
+
+**Règle** : toujours `.requestMatchers("/error").permitAll()`.
+
+**Vécu** : 401 opaque alors que le vrai problème était un 400 validation.
+
+---
+
+### Q146. `@PreAuthorize` vs `authorizeHttpRequests` ?
+
+**R courte** :
+- `authorizeHttpRequests` : filtre au niveau **HTTP** (chemin)
+- `@PreAuthorize` : contrôle au niveau **méthode** (expression SpEL)
+
+**Avantage `@PreAuthorize`** : logique métier (ex. `hasRole('ADMIN') and #id == authentication.principal.id`).
+
+**Combinaison** : `permitAll()` sur le filtre + `@PreAuthorize("hasRole('ADMIN')")` sur la méthode = **défense en profondeur**.
+
+---
+
+### Q147. Différence entre DTO, Entity et Request body ?
+
+**R courte** :
+- **Entity** : objet JPA (`@Entity`)
+- **DTO** (Data Transfer Object) : objet de **transport** entre couches
+- **Request** : objet d'entrée API (avec validation `@Valid`)
+
+**Architecture propre** :
+HTTP → CreateBookRequest (String) → BookMapper → Book (domaine) → Entity
+HTTP ← BookResponse (DTO) ← BookMapper ← Book (domaine) ← Entity
+
+
+**Piège** : ne jamais exposer les entités JPA directement (couplage, lazy-loading).
+
+---
+
+### Q148. Comment Spring Data pagine-t-il les résultats ?
+
+**R courte** : `Page<T>` avec `content: T[]`, `totalElements`, `totalPages`, `number`, `size`.
+
+**Côté client** : Angular doit extraire `.content`, pas le tableau entier.
+
+**Paramètres** : `?page=0&size=10&sort=title,asc` (par défaut Spring Data).
+
+**Piège** : `page` commence à **0** (indices 0-based).
+
+---
+
+### Q149. Pourquoi `curl.exe` sur Windows casse le JSON ?
+
+**R courte** : PowerShell interprète mal les guillemets autour de `-d`. Le body arrive tronqué.
+
+**Solutions** :
+- Utiliser `Invoke-RestMethod` (natif PowerShell, fiable)
+- Écrire le JSON dans un fichier + `curl --data-binary @fichier.json`
+
+**Règle** : sur Windows, **`Invoke-RestMethod` pour JSON**.
+
+---
+
+### Q150. CORS — pourquoi configurer côté Spring ?
+
+**R courte** : Angular (4200) et Spring (8080) sont des **origines différentes**. Le navigateur bloque par défaut (`Same-Origin Policy`).
+
+**Config** :
+- `CorsConfig.java` (WebMvcConfigurer) pour autoriser les origines
+- `.cors(cors -> cors.configure(http))` dans SecurityConfig pour que Spring Security laisse passer les préflight `OPTIONS`
+
+**Piège** : CORS seule ne suffit pas si Spring Security bloque en amont.

@@ -455,3 +455,53 @@ Ajoutez **à la fin** :
 - Déploiement local en 1 commande
 - Nettoyage du workaround `@DirtiesContext`
 - Dockerfile test + première image
+
+---
+
+## 2026-10-12 (lundi) — J18 + J19
+
+### ✅ Fait — J18 (Docker Compose)
+- `docker-compose.yml` : postgres + backend + adminer (avec healthchecks)
+- `application-docker.yml` : profil Spring pour Docker
+- `Dockerfile` multi-stage reconstruit (Maven build → JRE alpine)
+- `.dockerignore`, `.env.example`
+- Backend en Docker sur 8080, PostgreSQL sur 5432, Adminer sur 8888
+- Test : `docker-compose up -d` → 3 conteneurs healthy
+- Login JWT fonctionnel via Docker
+
+### ✅ Fait — J19 (Angular 19)
+- Angular CLI 19.2.27 installé (désinstallation Node 24 → Node 22.11.0)
+- Projet `bookhub-frontend` créé (standalone components, SCSS)
+- `BookService` Angular avec pagination (`Page<T>`)
+- `BookListComponent` affiche les livres depuis l'API
+- `app.config.ts` : `provideHttpClient()`
+- `app.routes.ts` : route `/books`
+- `CorsConfig.java` côté Spring (autorise localhost:4200)
+- `SecurityConfig` : `permitAll` + `/error` + matcher Swagger propre
+
+### 💡 Appris (5 problèmes d'infra résolus)
+1. **`winget` absent** → téléchargement direct des MSI Node
+2. **Node 24 incompatible Angular** → désinstaller + installer Node 22 LTS
+3. **`ng` pas dans le PATH** → ajouter `%AppData%\npm` au PATH
+4. **`curl.exe` sur Windows casse le JSON** → utiliser `Invoke-RestMethod`
+5. **`/error` bloqué par Security** → erreurs 401 au lieu de 400/500
+6. **DTO ≠ Entity ≠ Request** → `CreateBookRequest` (String) vs `BookDto` (objets Isbn/Money)
+7. **Spring Data retourne `Page<T>`** → Angular doit extraire `.content`
+
+### 📊 Métriques
+- Tests backend : 102 (inchangés)
+- Services Docker : 3 (postgres, backend, adminer)
+- Composants Angular : 1 (`BookListComponent`)
+- Services Angular : 1 (`BookService`)
+- Q/R : à mettre à jour dans ENTRETIEN.md
+
+### ⚠️ Dette technique
+- `/api/books/**` doit repasser en `authenticated()` (fait en fix CI)
+- Angular sans login (J20 va l'ajouter)
+- Doublons ISBN en BDD → migration V5 à créer
+- Pas de seeds automatiques → migration V6 à créer
+
+### 🎯 Demain (J20)
+- Angular Auth JWT : login + interceptor + guards
+- Désactiver `@DirtiesContext` (dette J17)
+- Re-build backend avec `authenticated()` sur books
