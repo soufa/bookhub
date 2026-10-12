@@ -505,3 +505,53 @@ Ajoutez **à la fin** :
 - Angular Auth JWT : login + interceptor + guards
 - Désactiver `@DirtiesContext` (dette J17)
 - Re-build backend avec `authenticated()` sur books
+
+---
+
+## 2026-10-12 (lundi, après-midi) — J20
+
+### ✅ Fait — Angular Auth JWT
+- `AuthService` : login, logout, stockage token (localStorage), signal `currentUser`
+- `AuthInterceptor` : ajoute automatiquement `Authorization: Bearer <token>`
+- `LoginComponent` : formulaire réactif + gestion erreurs + comptes de test affichés
+- `AuthGuard` : protège `/books`, redirige vers `/login`
+- `AppComponent` : header avec username + bouton déconnexion
+- `app.routes.ts` : `/login` public, `/books` protégé par `authGuard`
+- `app.config.ts` : `provideHttpClient(withInterceptors([authInterceptor]))`
+- Refactor avec **Angular 17+ control flow** (`@if` au lieu de `*ngIf`) → plus de `CommonModule`
+
+### 💡 Appris
+- **Interceptor fonctionnel** (`HttpInterceptorFn`) : nouvelle API Angular 15+
+- **Signals Angular** (`signal()`) : état réactif moderne
+- **Guard fonctionnel** (`CanActivateFn`) : nouvelle syntaxe Angular 15+
+- **Control flow `@if`** : plus besoin d'importer `CommonModule`
+- **`provideHttpClient(withInterceptors(...))`** : config standalone
+- **localStorage** pour le JWT : simple, persiste au refresh
+- **Piège `title`** : Angular 19 n'expose plus `title` par défaut dans `AppComponent`
+
+### 📊 Métriques
+- Composants Angular : 2 (`LoginComponent`, `BookListComponent`)
+- Services Angular : 2 (`AuthService`, `BookService`)
+- Interceptors : 1 (`AuthInterceptor`)
+- Guards : 1 (`AuthGuard`)
+- Tests backend : 102 (inchangés)
+- Q/R : à mettre à jour (Q151-Q160)
+
+### 🎯 Flow JWT validé bout-en-bout
+1. Login → POST `/api/auth/login` → JWT + refresh token stockés
+2. Navigation → guard vérifie `isLoggedIn()`
+3. Appel API → interceptor ajoute `Bearer <token>`
+4. Backend → `JwtAuthenticationFilter` valide → `SecurityContext` peuplé
+5. Réponse → 200 avec données
+
+### ⚠️ Dette technique (à traiter en J21)
+- Refresh token non utilisé côté Angular (access token expire après 1h)
+- Pas de gestion du 401 (redirect auto vers /login si token expiré)
+- Pas de "remember me" (localStorage = session persistante)
+- Désactiver `@DirtiesContext(BEFORE_EACH)` dans les IT (dette J17)
+
+### 🎯 Demain (J21)
+- Workflow CD GitHub Actions : build + push Docker sur GHCR
+- Déploiement sur Fly.io (backend) + Netlify/Vercel (frontend)
+- Env vars de prod (JWT secret, DB URL)
+- Badge CD dans le README
