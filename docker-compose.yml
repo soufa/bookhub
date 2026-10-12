@@ -1,4 +1,5 @@
 ﻿services:
+
   postgres:
     image: postgres:16-alpine
     container_name: bookhub-postgres
@@ -7,23 +8,51 @@
       POSTGRES_USER: bookhub
       POSTGRES_PASSWORD: bookhub
     ports:
-      - "5434:5432"
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U bookhub"]
+      test: ["CMD-SHELL", "pg_isready -U bookhub -d bookhub"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
+    networks:
+      - bookhub-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: bookhub-backend:0.1.0
+    container_name: bookhub-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bookhub
+      SPRING_DATASOURCE_USERNAME: bookhub
+      SPRING_DATASOURCE_PASSWORD: bookhub
+      APP_JWT_SECRET: docker-secret-0123456789abcdef0123456789abcdef0123456789abcdef
+    ports:
+      - "8080:8080"
+    networks:
+      - bookhub-net
 
   adminer:
     image: adminer:latest
     container_name: bookhub-adminer
-    ports:
-      - "8090:8080"
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
+    ports:
+      - "8888:8080"
+    networks:
+      - bookhub-net
 
 volumes:
   pgdata:
+
+networks:
+  bookhub-net:
+    driver: bridge
