@@ -593,3 +593,58 @@ Ajoutez **à la fin** :
 - Env vars de prod (JWT secret, DB URL)
 - README final + screenshots + vidéo démo
 - Post LinkedIn
+
+---
+
+## 2026-10-12 (lundi) — J23
+
+### ✅ Fait — Spring Batch : import CSV
+- Dépendance `spring-boot-starter-batch` ajoutée
+- Config `spring.batch.job.enabled: false` (pas d'auto-run au boot)
+- CSV `books-import.csv` avec 8 livres
+- `BookCsvRecord` DTO + `BookItemProcessor` (validation + skip doublon via `existsByIsbn`)
+- `ImportBooksJobConfig` : job `importBooksJob`
+  - Reader : `FlatFileItemReader` (CSV, `linesToSkip=1`)
+  - Processor : `BookItemProcessor` (validation ISBN + devise + doublon)
+  - Writer : `JpaItemWriter`
+  - `chunk(10)` + `faultTolerant().skip().skipLimit(20)`
+- Endpoint `POST /api/batch/import` (ADMIN)
+- **Fix critique** : `BookController` utilise `BookService` (JPA) au lieu de `OldBookService` (mémoire)
+- **Test manuel réussi** : job COMPLETED → 8 livres en DB (6 du seed V6 + 2 nouveaux)
+- Q171 → Q180 dans `ENTRETIEN.md`
+
+### 💡 Appris (12 concepts clés)
+1. Structure `Job → Step → Chunk(Reader, Processor, Writer)`
+2. `FlatFileItemReaderBuilder` pour CSV
+3. `JpaItemWriter` pour insertion JPA
+4. `faultTolerant().skip().skipLimit()` pour résister aux erreurs
+5. `JobParameters` avec timestamp pour unicité d'exécution
+6. `JobLauncher.run()` depuis un endpoint REST
+7. `spring.batch.job.enabled: false` pour empêcher l'auto-run
+8. `@Qualifier` sur un bean `Job` quand plusieurs jobs
+9. **Tolérance aux doublons** : `existsByIsbn` dans le Processor (skip propre)
+10. **Debug Spring Batch** : tables `BATCH_*` + `exit_message`
+11. **Idempotence** : le job peut être relancé sans erreur (ON CONFLICT ou skip)
+12. **Sécurité** : `@PreAuthorize("hasRole('ADMIN')")` sur les endpoints batch
+
+### ⚠️ Pièges vécus et résolus
+| Piège | Symptôme | Fix |
+|-------|----------|-----|
+| **Doublon ISBN** | `DuplicateKeyException` → job FAILED | `existsByIsbn()` dans le Processor |
+| **Container Docker ancien** | API retourne 0 alors que la DB a 6 | `docker-compose build --no-cache backend` |
+| **Flyway checksum mismatch** | `Migration checksum mismatch for V6` | `docker-compose down -v` (reset DB) |
+| **Classe dans mauvais fichier** | `BookItemProcessor should be in BookItemProcessor.java` | Restaurer les 2 fichiers |
+| **`OldBookService` en mémoire** | SQL Hibernate vide, API retourne 0 | Remplacer par `BookService` (JPA) |
+
+### 📊 Métriques
+- Tests : 102 (inchangés)
+- Jobs Batch : 1 (`importBooksJob`)
+- Executions : 3 (2 COMPLETED, 1 FAILED initial)
+- Livres en DB : 8 (6 seed + 2 import)
+- Q/R : 180
+
+### 🎯 Demain (J24)
+- Job `computeStatisticsJob` (Tasklet) — calculs par statut, prix moyen
+- Scheduler `@Scheduled(cron = "0 0 2 * * *")` — stats automatiques
+- Endpoint `GET /api/batch/runs` (JobExplorer) — historique
+- 2-3 tests d'intégration Spring Batch
