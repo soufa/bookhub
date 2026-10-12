@@ -48,3 +48,5 @@ app:
     secret: "test-secret-0123456789abcdef0123456789abcdef0123456789abcdef"
     expiration-ms: 3600000
     refresh-expiration-days: 7
+  cors:
+      allowed-origins: http://localhost:4200

@@ -60,8 +60,12 @@ public class DataSourceConfig {
             ds.setPassword(password);
             ds.setDriverClassName("org.postgresql.Driver");
             ds.setMaximumPoolSize(5);
-            ds.setConnectionTimeout(30_000);      // 30s au lieu de 30s par défaut
-            ds.setInitializationFailTimeout(-1);   // ne pas échouer au boot si DB pas prête
+            ds.setMinimumIdle(1);
+            ds.setConnectionTimeout(30_000);
+            ds.setIdleTimeout(60_000);
+            ds.setMaxLifetime(1_800_000);
+            ds.setKeepaliveTime(30_000);
+            ds.setInitializationFailTimeout(-1);
             return ds;
         } catch (Exception e) {
             throw new IllegalStateException("Invalid DATABASE_URL: " + e.getMessage(), e);
