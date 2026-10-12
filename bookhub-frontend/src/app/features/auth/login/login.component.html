@@ -1,0 +1,33 @@
+<div class="login-container">
+  <h1>🔐 Connexion BookHub</h1>
+
+  <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+    <div class="field">
+      <label for="username">Nom d'utilisateur</label>
+      <input id="username" type="text" name="username" [(ngModel)]="username"
+             required autocomplete="username" placeholder="user ou admin" />
+    </div>
+
+    <div class="field">
+      <label for="password">Mot de passe</label>
+      <input id="password" type="password" name="password" [(ngModel)]="password"
+             required autocomplete="current-password" placeholder="••••••••" />
+    </div>
+
+    <button type="submit" [disabled]="!loginForm.form.valid || loading()">
+      {{ loading() ? 'Connexion…' : 'Se connecter' }}
+    </button>
+  </form>
+
+  @if (error()) {
+  <div class="error">{{ error() }}</div>
+  }
+
+  <div class="hint">
+    <p><strong>Comptes de test :</strong></p>
+    <ul>
+      <li><code>user / user123</code></li>
+      <li><code>admin / admin123</code></li>
+    </ul>
+  </div>
+</div>
