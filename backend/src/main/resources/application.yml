@@ -22,7 +22,11 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
-
+  batch:
+    job:
+     enabled: false              # désactive le lancement auto au boot
+    jdbc:
+      initialize-schema: always    # crée les tables BATCH_* au démarrage
 server:
   port: 8080
 

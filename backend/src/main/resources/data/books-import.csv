@@ -1,0 +1,9 @@
+title,author,isbn,price,currency
+"Effective Java","Joshua Bloch","9780134685991",45.00,"EUR"
+"Clean Code","Robert Martin","9780132350884",38.00,"EUR"
+"Java Concurrency in Practice","Brian Goetz","9780321349606",52.00,"EUR"
+"Refactoring","Martin Fowler","9780134757599",48.00,"EUR"
+"Domain-Driven Design","Eric Evans","9780321125217",55.00,"EUR"
+"The Pragmatic Programmer","Andrew Hunt","9780135957059",42.00,"EUR"
+"Design Patterns","Erich Gamma","9780201633610",65.00,"EUR"
+"Working Effectively with Legacy Code","Michael Feathers","9780131177055",58.00,"EUR"
