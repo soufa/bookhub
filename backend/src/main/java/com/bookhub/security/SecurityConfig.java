@@ -52,8 +52,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/debug/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/error").permitAll()                // ← AJOUTER
-                        .requestMatchers("/api/books/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/books/**").authenticated()   // ← RESTAURÉ
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(s -> s

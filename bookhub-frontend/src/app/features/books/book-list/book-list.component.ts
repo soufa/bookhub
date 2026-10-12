@@ -19,6 +19,7 @@ export class BookListComponent implements OnInit {
   error: string | null = null;
 
   ngOnInit(): void {
+    console.log('🚀 BookListComponent init — appel du service');
     this.bookService.getAll().subscribe({
       next: (page) => {
         this.books = page.content;
