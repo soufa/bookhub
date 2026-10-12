@@ -555,3 +555,41 @@ Ajoutez **à la fin** :
 - Déploiement sur Fly.io (backend) + Netlify/Vercel (frontend)
 - Env vars de prod (JWT secret, DB URL)
 - Badge CD dans le README
+
+
+---
+
+## 2026-10-12 (lundi, fin d'après-midi) — J21
+
+### ✅ Fait — CD GitHub Actions
+- Workflow `.github/workflows/cd.yml`
+- Job `build-and-push-backend` : build JAR + push image Docker sur GHCR
+- Job `build-frontend` : build Angular production + upload artifact
+- Metadata Docker (tags : `main`, `latest`, `sha-xxxxx`, `v0.1.0`)
+- Cache Maven (`setup-java@v4 cache: maven`), Docker (`type=gha`), npm (`setup-node@v4 cache: npm`)
+- Enrichissement de `ci.yml` : ajout job `frontend` (Node 22 + `npm ci` + build prod)
+
+### 💡 Appris
+- `permissions: packages: write` obligatoire pour pousser sur GHCR
+- `docker/metadata-action@v5` génère les tags automatiquement
+- `docker/build-push-action@v5` avec `cache-from/cache-to: type=gha`
+- 4 niveaux de tags utiles : branche, latest, sha, version sémantique
+- `workflow_dispatch` = déclenchement manuel
+- `actions/upload-artifact@v4` pour partager un build entre jobs
+- Piège : `cd.yml` copié/collé du `ci.yml` → workflow sans Docker
+
+### 📊 Métriques
+- Workflows GitHub Actions : 2 (CI + CD)
+- Jobs CI : 2 (backend, frontend)
+- Jobs CD : 2 (build-and-push-backend, build-frontend)
+- Images GHCR : 1 (`ghcr.io/soufa/bookhub/backend`)
+- Durée CI : ~1m25s
+- Durée CD : ~6-8 min
+- Tests backend : 102 (inchangés)
+
+### 🎯 Demain (J22)
+- Déploiement backend sur Fly.io
+- Déploiement frontend sur Netlify / Vercel
+- Env vars de prod (JWT secret, DB URL)
+- README final + screenshots + vidéo démo
+- Post LinkedIn
