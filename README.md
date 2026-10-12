@@ -1,5 +1,8 @@
 ﻿# BookHub
 
+[![CI](https://github.com/soufa/bookhub/actions/workflows/ci.yml/badge.svg)](https://github.com/soufa/bookhub/actions/workflows/ci.yml)
+[![CD](https://github.com/soufa/bookhub/actions/workflows/cd.yml/badge.svg)](https://github.com/soufa/bookhub/actions/workflows/cd.yml)
+[![Container](https://img.shields.io/badge/ghcr.io-backend-blue)](https://github.com/soufa/bookhub/pkgs/container/bookhub%2Fbackend)
 > Application full-stack de gestion de bibliothèque — Java 17 · Spring Boot 3.2 · Angular 17 · PostgreSQL · Docker
 
 ## Objectif
