@@ -59,13 +59,14 @@ public class DataSourceConfig {
             ds.setUsername(username);
             ds.setPassword(password);
             ds.setDriverClassName("org.postgresql.Driver");
-            ds.setMaximumPoolSize(5);
+            ds.setMaximumPoolSize(3);
             ds.setMinimumIdle(1);
             ds.setConnectionTimeout(30_000);
             ds.setIdleTimeout(60_000);
             ds.setMaxLifetime(1_800_000);
             ds.setKeepaliveTime(30_000);
             ds.setInitializationFailTimeout(-1);
+            ds.setConnectionInitSql("SET synchronous_commit = ON");
             return ds;
         } catch (Exception e) {
             throw new IllegalStateException("Invalid DATABASE_URL: " + e.getMessage(), e);
