@@ -13,18 +13,28 @@ import java.util.Map;
 @Service
 public class AppUserDetailsService implements UserDetailsService {
 
-    private final Map<String, UserDetails> users;
     private final PasswordEncoder passwordEncoder;
+
+    // Map username → [password, roles]
+    private static final Map<String, String[]> USERS = Map.of(
+            "user",  new String[]{"user123", "USER"},
+            "admin", new String[]{"admin123", "USER", "ADMIN"}
+    );
 
     public AppUserDetailsService(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
-        this.users = Map.of(
-                "user",  buildUser("user",  "user123",  "USER"),
-                "admin", buildUser("admin", "admin123", "USER", "ADMIN")
-        );
     }
 
-    private UserDetails buildUser(String username, String rawPassword, String... roles) {
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        String[] entry = USERS.get(username);
+        if (entry == null) {
+            throw new UsernameNotFoundException("User not found: " + username);
+        }
+
+        String rawPassword = entry[0];
+        String[] roles = Arrays.copyOfRange(entry, 1, entry.length);
+
         String[] cleanRoles = Arrays.stream(roles)
                 .map(r -> r.startsWith("ROLE_") ? r.substring(5) : r)
                 .filter(r -> !r.isBlank())
@@ -34,14 +44,5 @@ public class AppUserDetailsService implements UserDetailsService {
                 .password(passwordEncoder.encode(rawPassword))
                 .roles(cleanRoles)
                 .build();
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) {
-        UserDetails user = users.get(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found: " + username);
-        }
-        return user;
     }
 }
