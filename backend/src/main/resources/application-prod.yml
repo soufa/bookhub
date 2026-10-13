@@ -23,7 +23,10 @@ app:
     refresh-expiration-days: 7
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:4200}
-
+  batch:
+    scheduler:
+      enabled: true
+      statistics-cron: "0 0 2 * * *"
 management:
   endpoints:
     web:

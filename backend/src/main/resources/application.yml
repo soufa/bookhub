@@ -27,6 +27,9 @@ spring:
      enabled: false              # désactive le lancement auto au boot
     jdbc:
       initialize-schema: always    # crée les tables BATCH_* au démarrage
+    scheduler:
+      enabled: true
+      statistics-cron: "0 0 2 * * *"   # 2h du matin, tous les jours
 server:
   port: 8080
 
