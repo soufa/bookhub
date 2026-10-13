@@ -648,3 +648,74 @@ Ajoutez **à la fin** :
 - Scheduler `@Scheduled(cron = "0 0 2 * * *")` — stats automatiques
 - Endpoint `GET /api/batch/runs` (JobExplorer) — historique
 - 2-3 tests d'intégration Spring Batch
+
+## 2026-10-13 (mardi) — J24
+
+### ✅ Fait — Spring Batch : Tasklet + Scheduler
+- Migration Flyway V7 : table `book_statistics`
+- `StatisticsDto` (computedAt, totalBooks, available, borrowed, avgPrice, topAuthor)
+- `ComputeStatisticsTasklet` (calcul + insert snapshot)
+- `ComputeStatisticsJobConfig` (tasklet-based)
+- `BatchScheduler` avec `@Scheduled(cron = "0 0 2 * * *")`
+- `SchedulingConfig` avec `@EnableScheduling`
+- Enrichissement `BatchController` :
+  - `POST /api/batch/statistics` (ADMIN)
+  - `GET /api/batch/runs?limit=N` (ADMIN)
+  - `GET /api/batch/statistics/latest` (ADMIN)
+- **Test manuel** : statistics job COMPLETED
+- Q181 → Q190 dans ENTRETIEN.md
+
+### 💡 Appris
+- `Tasklet` (vs chunk) pour actions uniques
+- `@Scheduled` avec cron expression
+- `@EnableScheduling` (obligatoire)
+- `JobExplorer` pour interroger l'historique
+- `JdbcTemplate` pour requêtes SQL directes
+- `@ConditionalOnProperty` pour feature flags
+- **Snapshot pattern** : insérer une ligne par exécution
+
+### 📊 Métriques
+- Tests : 102 (inchangés)
+- Jobs Batch : 2 (`importBooksJob`, `computeStatisticsJob`)
+- Endpoints Batch : 4
+- Q/R : 190
+
+### 🎯 Demain (J25)
+- Actuator Batch (monitoring)
+- Tests d'intégration Spring Batch
+- Migration Flyway V7 pour les tables `BATCH_*` en prod
+
+---
+
+## 2026-10-13 (mardi) — J25
+
+### ✅ Fait — Monitoring Batch + tests
+- Migration Flyway V7 : `book_statistics` (aligné prod)
+- `ComputeStatisticsTasklet` : agrégation + snapshot
+- `ComputeStatisticsJobConfig` : Job + Step + `JobLoggingListener`
+- `BookSkipPolicy` : skip seulement `DuplicateKeyException`
+- `POST /api/batch/statistics` (ADMIN) — lance le job
+- Test d'intégration `ComputeStatisticsJobTest` (H2)
+- **Tests : 115 verts** (103 Surefire + 12 Failsafe)
+
+### 💡 Appris (5 pièges vécus en cascade)
+1. **`AUTO_INCREMENT` (MySQL) ≠ `BIGSERIAL` (PostgreSQL)** — H2 en `MODE=PostgreSQL` rejette le premier
+2. **Indentation YAML** : `spring.batch.jdbc.initialize-schema` doit être sous `spring:`, pas à la racine
+3. **`TestSecurityConfig` casse les tests de sécurité** — il désactive `anyRequest().permitAll()`, donc `isUnauthorized()` échoue
+4. **Spring Batch a besoin de son schéma** : `initialize-schema: always` en test
+5. **`schema.sql` de test ≠ Flyway V7** : colonnes désalignées → job FAILED → test FAILED
+
+### 📊 Métriques
+- Tests Surefire : 103
+- Tests Failsafe : 12
+- Q/R : 195
+- Migrations Flyway : V1 → V8
+
+### ⚠️ Dette technique
+- `schema.sql` maintenu manuellement → risque de désalignement futur
+- Envisager : Flyway en test avec H2 mode PostgreSQL (à faire en J26)
+
+### 🎯 Demain (J26)
+- Nettoyage du workaround `@DirtiesContext` (J17)
+- Option : Flyway en test (H2 mode PostgreSQL)
+- Suite Angular : auth JWT (login form + interceptor + guards)
