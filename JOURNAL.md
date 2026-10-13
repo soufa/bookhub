@@ -719,3 +719,37 @@ Ajoutez **à la fin** :
 - Nettoyage du workaround `@DirtiesContext` (J17)
 - Option : Flyway en test (H2 mode PostgreSQL)
 - Suite Angular : auth JWT (login form + interceptor + guards)
+
+
+
+### 4. Section J27 dans `JOURNAL.md`
+
+```markdown
+---
+
+## 2026-10-13 (mardi) — J27
+
+### ✅ Fait — Auto-refresh JWT sur 401
+- `AuthService.refresh()` : appelle `/api/auth/refresh` (avec rotation)
+- `AuthService.clearSession()` : nettoie + redirect si refresh échoue
+- `refreshInterceptor` : capture les 401, rejoue la requête avec nouveau token
+- Gestion concurrence : 1 seul refresh via `BehaviorSubject` + `isRefreshing`
+- Exclusion `/api/auth/**` pour éviter les boucles infinies
+- `app.config.ts` : ordre `[refreshInterceptor, authInterceptor]`
+- **Test E2E** : token expiré → refresh auto → 200 transparent ✅
+
+### 💡 Appris (3 pièges vécus)
+1. **Boucle infinie** : exclure `/api/auth/**` du refresh interceptor
+2. **Concurrence** : `BehaviorSubject` + `isRefreshing` pour ne faire qu'1 refresh
+3. **Ordre des interceptors** : `refreshInterceptor` AVANT `authInterceptor`
+
+### 📊 Métriques
+- Tests backend : 115
+- Interceptors Angular : 2 (auth + refresh)
+- Q/R : 205
+- Tokens côté client : access (1h) + refresh (7j)
+
+### 🎯 Demain (J28)
+- Tests unitaires Angular (auth.service.spec.ts, refresh.interceptor.spec.ts)
+- Ou CI/CD complet (Docker frontend + GitHub Actions)
+- Ou portfolio / README / démo en ligne
