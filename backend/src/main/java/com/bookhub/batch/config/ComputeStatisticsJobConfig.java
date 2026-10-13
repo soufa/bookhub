@@ -1,5 +1,6 @@
 package com.bookhub.batch.config;
 
+import com.bookhub.batch.listener.JobLoggingListener;
 import com.bookhub.batch.tasklet.ComputeStatisticsTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -31,8 +32,10 @@ public class ComputeStatisticsJobConfig {
 
     @Bean
     public Job computeStatisticsJob(JobRepository jobRepository,
-                                    Step computeStatisticsStep) {
+                                    Step computeStatisticsStep,
+                                    JobLoggingListener listener) {
         return new JobBuilder(JOB_NAME, jobRepository)
+                .listener(listener)
                 .start(computeStatisticsStep)
                 .build();
     }

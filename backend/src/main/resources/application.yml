@@ -26,10 +26,11 @@ spring:
     job:
      enabled: false              # désactive le lancement auto au boot
     jdbc:
-      initialize-schema: always    # crée les tables BATCH_* au démarrage
+      initialize-schema: never   # ← changer always → never
     scheduler:
       enabled: true
       statistics-cron: "0 0 2 * * *"   # 2h du matin, tous les jours
+
 server:
   port: 8080
 
@@ -57,3 +58,11 @@ app:
     refresh-expiration-days: 7
   cors:
       allowed-origins: http://localhost:4200
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,batch
+  endpoint:
+    health:
+      show-details: always

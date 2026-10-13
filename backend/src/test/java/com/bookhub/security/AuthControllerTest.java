@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -26,6 +27,7 @@ class AuthControllerTest {
         var req = new LoginRequest("user", "user123");
 
         mockMvc.perform(post("/api/auth/login")
+                        .with(csrf())                                    // ← ajout csrf
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
@@ -39,6 +41,7 @@ class AuthControllerTest {
         var req = new LoginRequest("user", "wrong");
 
         mockMvc.perform(post("/api/auth/login")
+                        .with(csrf())                                    // ← ajout csrf
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isUnauthorized());

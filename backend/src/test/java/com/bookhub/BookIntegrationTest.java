@@ -7,26 +7,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WithMockUser(username = "admin", roles = "ADMIN")   // ← AJOUTER
+@WithMockUser(username = "admin", roles = "ADMIN")
 class BookIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
 
     @Test
     void full_crud_flow() throws Exception {
@@ -36,6 +34,7 @@ class BookIntegrationTest {
                 new BigDecimal("45.00"), "EUR");
 
         String response = mockMvc.perform(post("/api/books")
+                        .with(csrf())                                     // ← ajout csrf
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -55,21 +54,18 @@ class BookIntegrationTest {
                 new BigDecimal("50.00"), "EUR");
 
         mockMvc.perform(put("/api/books/" + id)
+                        .with(csrf())                                     // ← ajout csrf
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Effective Java 3rd"));
 
         // 4. Delete
-        mockMvc.perform(delete("/api/books/" + id))
+        mockMvc.perform(delete("/api/books/" + id).with(csrf()))      // ← ajout csrf
                 .andExpect(status().isNoContent());
 
         // 5. Verify deleted
         mockMvc.perform(get("/api/books/" + id))
                 .andExpect(status().isNotFound());
     }
-    /**
-     * Le @ActiveProfiles("test") va charger la BDD PostgreSQL.
-     * Comme on n'a pas de profil test configuré, créez application-test.yml :
-     */
 }

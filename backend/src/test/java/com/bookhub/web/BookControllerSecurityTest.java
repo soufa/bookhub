@@ -8,6 +8,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,21 +28,21 @@ class BookControllerSecurityTest {
     @Test
     @WithMockUser(username = "user", roles = "USER")
     void should_allow_user_to_list() throws Exception {
-        mockMvc.perform(get("/api/books")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/books"))
+                .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
     void should_forbid_user_to_delete() throws Exception {
-        mockMvc.perform(delete("/api/books/1"))
+        mockMvc.perform(delete("/api/books/1").with(csrf()))   // ← ajout csrf
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
     void should_allow_admin_to_delete() throws Exception {
-        // 404 = autorisé mais ressource absente (le contrôle d'accès est passé)
-        mockMvc.perform(delete("/api/books/9999"))
+        mockMvc.perform(delete("/api/books/9999").with(csrf()))  // ← ajout csrf
                 .andExpect(status().isNotFound());
     }
 }

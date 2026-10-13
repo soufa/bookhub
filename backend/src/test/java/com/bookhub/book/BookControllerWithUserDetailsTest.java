@@ -9,6 +9,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -29,7 +30,7 @@ class BookControllerWithUserDetailsTest {
     @Test
     @WithUserDetails(value = "admin", userDetailsServiceBeanName = "appUserDetailsService")
     void admin_can_delete_book() throws Exception {
-        mockMvc.perform(delete("/api/books/999"))
-                .andExpect(status().isNotFound());  // 404 = bien passé la sécurité
+        mockMvc.perform(delete("/api/books/999").with(csrf()))   // ← ajout csrf
+                .andExpect(status().isNotFound());
     }
 }

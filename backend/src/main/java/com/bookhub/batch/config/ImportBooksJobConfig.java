@@ -1,6 +1,8 @@
 package com.bookhub.batch.config;
 
 import com.bookhub.batch.dto.BookCsvRecord;
+import com.bookhub.batch.listener.JobLoggingListener;
+import com.bookhub.batch.policy.BookSkipPolicy;
 import com.bookhub.batch.processor.BookItemProcessor;
 import com.bookhub.book.Book;
 import jakarta.persistence.EntityManagerFactory;
@@ -60,15 +62,16 @@ public class ImportBooksJobConfig {
                 .processor(bookItemProcessor)
                 .writer(bookJpaWriter)
                 .faultTolerant()
-                .skip(Exception.class)
-                .skipLimit(20)
+                .skipPolicy(new BookSkipPolicy())
                 .build();
     }
 
     @Bean
     public Job importBooksJob(JobRepository jobRepository,
-                              Step importBooksStep) {
+                              Step importBooksStep,
+                              JobLoggingListener listener) {
         return new JobBuilder(JOB_NAME, jobRepository)
+                .listener(listener)
                 .start(importBooksStep)
                 .build();
     }
