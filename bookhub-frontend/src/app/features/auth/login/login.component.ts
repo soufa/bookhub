@@ -21,7 +21,12 @@ export class LoginComponent {
   loading = signal(false);
   error = signal<string | null>(null);
 
-  onSubmit() {
+  onSubmit(): void {
+    if (!this.username || !this.password) {
+      this.error.set('Veuillez remplir tous les champs');
+      return;
+    }
+
     this.loading.set(true);
     this.error.set(null);
 
@@ -33,11 +38,9 @@ export class LoginComponent {
         },
         error: (err) => {
           this.loading.set(false);
-          if (err.status === 401) {
-            this.error.set('Identifiants invalides');
-          } else {
-            this.error.set(`Erreur ${err.status}`);
-          }
+          this.error.set(err.status === 401
+            ? 'Identifiants invalides'
+            : `Erreur ${err.status}`);
         }
       });
   }

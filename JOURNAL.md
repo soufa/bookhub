@@ -724,7 +724,6 @@ Ajoutez **à la fin** :
 
 ### 4. Section J27 dans `JOURNAL.md`
 
-```markdown
 ---
 
 ## 2026-10-13 (mardi) — J27
@@ -753,3 +752,63 @@ Ajoutez **à la fin** :
 - Tests unitaires Angular (auth.service.spec.ts, refresh.interceptor.spec.ts)
 - Ou CI/CD complet (Docker frontend + GitHub Actions)
 - Ou portfolio / README / démo en ligne
+
+
+---
+
+## 2026-10-14 (mercredi) — J28 (Bloc A) : Tests Angular
+
+### ✅ Fait — 31 tests frontend
+- `auth.service.spec.ts` : 11 tests (login, logout, isLoggedIn, refresh, clearSession)
+- `auth.interceptor.spec.ts` : 3 tests (header Bearer, exclusion /api/auth, cas sans token)
+- `refresh.interceptor.spec.ts` : 4 tests (pass-through, 401 → refresh → retry, session expired, boucle infinie)
+- `login.component.spec.ts` : 5 tests (submit valide, erreurs 401/500, champs vides)
+- `book-list.component.spec.ts` : 4 tests (load, error, rendu DOM, empty state)
+- `app.component.spec.ts` : 2 tests (création, logout appelé)
+- `book.service.spec.ts` : 2 tests (création, GET avec pagination)
+- **Total** : 31 tests verts (au lieu de ~3 générés par défaut)
+
+### 💡 Appris (5 pièges vécus)
+
+#### 1. Karma n'a pas de `karma.conf.js` en Angular 17+
+- Angular CLI moderne **ne génère plus** `karma.conf.js`
+- Il faut **le créer manuellement** ET l'ajouter dans `angular.json` (`karmaConfig`)
+- Sans cette config, impossible d'utiliser `ChromeHeadlessNoSandbox`
+
+#### 2. Chrome headless crash en environnement CI
+- Erreur `Chrome crashed` + `Some of your tests did a full page reload`
+- **Fix** : launcher personnalisé `ChromeHeadlessNoSandbox` avec flags :
+  - `--no-sandbox`
+  - `--disable-gpu`
+  - `--disable-dev-shm-usage`
+  - `--disable-software-rasterizer`
+
+#### 3. Test par défaut généré par Angular CLI est incomplet
+- `ng generate service BookService` crée un test qui **ne fournit pas** `HttpClient`
+- Erreur : `NullInjectorError: No provider for HttpClient!`
+- **Fix** : ajouter `HttpClientTestingModule` aux imports + écrire de vrais tests
+
+#### 4. Validation avant appel asynchrone
+- `LoginComponent.onSubmit()` appelait `auth.login()` **avant** de vérifier les champs vides
+- Résultat : `Cannot read properties of undefined (reading 'subscribe')` dans le test
+- **Fix** : ajouter une garde `if (!username || !password) return;` **avant** l'appel
+
+#### 5. Mock `AuthService` dans les specs de composants
+- Le composant `AppComponent` injecte `AuthService`
+- Le test par défaut ne mocke pas → crash
+- **Fix** : `{ provide: AuthService, useValue: { isLoggedIn: () => false, ... } }`
+
+### 📊 Métriques
+- Tests backend : 115 (inchangés)
+- Tests frontend : **31** (nouveaux)
+- **Total** : **146 tests**
+- Q/R : 205
+
+### ⚠️ Dette technique
+- Pas encore de coverage frontend (Karma peut générer `coverage/`)
+- `book-list.component.spec.ts` : ajouter tests de pagination
+- Tests E2E Cypress (à prévoir J30+)
+
+### 🎯 À faire dans la suite de J28
+- Bloc B : Dockerfile Angular + GitHub Actions CI/CD
+- Bloc C : README + screenshots + déploiement démo
