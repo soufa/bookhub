@@ -40,6 +40,21 @@
     networks:
       - bookhub-net
 
+  frontend:
+    build:
+      context: ./bookhub-frontend
+      dockerfile: Dockerfile
+    image: bookhub-frontend:0.1.0
+    container_name: bookhub-frontend
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "4200:80"
+    networks:
+      - bookhub-net
+    restart: unless-stopped
+
   adminer:
     image: adminer:latest
     container_name: bookhub-adminer
