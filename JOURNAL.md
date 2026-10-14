@@ -812,3 +812,84 @@ Ajoutez **à la fin** :
 ### 🎯 À faire dans la suite de J28
 - Bloc B : Dockerfile Angular + GitHub Actions CI/CD
 - Bloc C : README + screenshots + déploiement démo
+
+
+### 2. Section J28 dans `JOURNAL.md`
+
+Collez le bloc ci-dessous à la fin :
+
+---
+
+## 2026-10-14 (mercredi) — J28
+
+### ✅ Fait — Tests Angular + Docker + CI/CD
+
+#### Bloc A — Tests Angular (31 tests)
+- `karma.conf.js` : ChromeHeadlessNoSandbox pour CI
+- `angular.json` : `karmaConfig` branché
+- 31 tests : auth.service (11), auth.interceptor (3), refresh.interceptor (4), login (5), book-list (4), app (2), book.service (2)
+
+#### Bloc B — Docker + CI/CD
+- `Dockerfile` frontend : multi-stage (node:22 + nginx:1.27) → image **74 Mo**
+- `nginx.conf` : SPA routing (`try_files`), gzip, cache control, security headers
+- `.dockerignore` : exclude node_modules/dist/IDE
+- `docker-compose.yml` : 4 services (postgres, backend, frontend, adminer)
+- `.github/workflows/ci-cd.yml` :
+  - `backend-tests` (mvn verify)
+  - `frontend-tests` (karma + build)
+  - `docker-backend` → push ghcr.io (main)
+  - `docker-frontend` → push ghcr.io (main)
+  - BuildKit cache (GHA)
+- Suppression des workflows obsolètes `cd.yml` et `ci.yml`
+
+### 🎯 Preuve finale
+
+### 🎯 Preuve finale
+docker pull ghcr.io/soufa/bookhub-backend:latest → ✅
+docker pull ghcr.io/soufa/bookhub-frontend:latest → ✅
+
+text
+
+### 💡 Appris (7 pièges vécus)
+
+#### 1. Chrome crash en headless sur Windows
+- `Some of your tests did a full page reload!`
+- Fix : `customLaunchers` avec flags `--no-sandbox --disable-gpu`
+
+#### 2. Karma n'a plus de `karma.conf.js` par défaut (Angular 17+)
+- Il faut le créer **ET** ajouter `"karmaConfig": "karma.conf.js"` dans `angular.json`
+
+#### 3. Test par défaut généré par `ng generate service` est incomplet
+- `NullInjectorError: No provider for HttpClient!`
+- Fix : `HttpClientTestingModule` + vrais tests
+
+#### 4. Validation avant appel asynchrone
+- `LoginComponent.onSubmit()` appelait `auth.login()` avant de vérifier les champs
+- Fix : garde `if (!username || !password) return;` **avant** l'appel
+
+#### 5. `.dockerignore` ne doit pas exclure `Dockerfile` ou `nginx.conf`
+- `COPY nginx.conf` échoue si `.dockerignore` exclut le fichier
+- Fix : exclure seulement node_modules, dist, .git, IDE
+
+#### 6. Busybox `wget` + nginx alpine : bug IPv6
+- `wget http://localhost/` résout `::1` (IPv6) → `Connection refused`
+- nginx écoute en IPv4 only (`0.0.0.0:80`)
+- Fix : forcer `127.0.0.1` dans le healthcheck
+
+#### 7. `permissions: packages: write` obligatoire pour ghcr.io
+- Sans : `denied: permission_denied: write_package`
+- `GITHUB_TOKEN` en lecture seule par défaut
+
+### 📊 Métriques
+- Tests backend : 115
+- Tests frontend : 31
+- **Total : 146 tests**
+- Image backend : ~150 Mo
+- Image frontend : **74 Mo**
+- CI/CD complet : **2 min** (premier run)
+- Q/R : 215
+
+### 🎯 Demain (J29)
+- Bloc C : README + screenshots + portfolio
+- Optionnel : déploiement démo (Fly.io, Railway)
+- Ou : tests E2E Cypress

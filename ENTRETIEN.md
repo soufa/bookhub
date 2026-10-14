@@ -6,7 +6,7 @@ Format :
 - Q : question
 - ******************R courte****************** : réponse en 30 s
 - ******Exemple****** : code
-- ********************Piège******************** : ce qui fait la différence
+- **********************Piège********************** : ce qui fait la différence
 - ********Vécu******** : anecdote perso
 
 ---
@@ -27,7 +27,7 @@ public record Isbn(String value) {
 }
 \\\
 
-********************Piège******************** : immuabilité shallow. Un record avec List doit avoir un compact constructor qui fait List.copyOf().
+**********************Piège********************** : immuabilité shallow. Un record avec List doit avoir un compact constructor qui fait List.copyOf().
 
 ---
 
@@ -35,7 +35,7 @@ public record Isbn(String value) {
 
 ********************R courte******************** : Record = immuable par défaut, pas de setters, equals/hashCode basés sur les composants, héritage interdit. Classe = libre, mutable.
 
-********************Piège******************** : un record ne peut pas étendre une classe.
+**********************Piège********************** : un record ne peut pas étendre une classe.
 
 ---
 
@@ -56,7 +56,7 @@ public record PageResult<T>(List<T> content, int page, int size, long total) {}
 
 ********************R courte******************** : Uniquement en retour de méthode quand l'absence est possible. Jamais en paramètre, jamais en champ JPA.
 
-********************Piège******************** : Optional.get() sans isPresent() est un anti-pattern.
+**********************Piège********************** : Optional.get() sans isPresent() est un anti-pattern.
 
 ---
 
@@ -78,7 +78,7 @@ public record PageResult<T>(List<T> content, int page, int size, long total) {}
 if (obj instanceof String s) {
     System.out.println(s.length());
 }
-********************Piège******************** : la variable s n'existe que dans la branche où le test est vrai (flow scoping).
+**********************Piège********************** : la variable s n'existe que dans la branche où le test est vrai (flow scoping).
 
 ********Vécu******** : (à remplir)
 
@@ -94,7 +94,7 @@ String label = switch (day) {
     case SATURDAY, SUNDAY -> "Weekend";
     default -> "Autre";
 };
-********************Piège******************** : default obligatoire sauf sur enum / sealed (exhaustivité vérifiée par le compilateur).
+**********************Piège********************** : default obligatoire sauf sur enum / sealed (exhaustivité vérifiée par le compilateur).
 
 ********Vécu******** : (à remplir)
 
@@ -106,14 +106,14 @@ String label = switch (day) {
 
 **************java**************
 public sealed interface Shape permits Circle, Rectangle {}
-********************Piège******************** : le compilateur peut vérifier l'exhaustivité des switch, sans default.
+**********************Piège********************** : le compilateur peut vérifier l'exhaustivité des switch, sans default.
 
 ********Vécu******** : (à remplir)
 
 #### Q9. Différence entre final et sealed ?
 ********************R courte******************** : final interdit toute extension. sealed autorise uniquement les sous-types listés.
 
-********************Piège******************** : une classe sealed peut être étendue par un autre sealed, final ou non-sealed.
+**********************Piège********************** : une classe sealed peut être étendue par un autre sealed, final ou non-sealed.
 
 ********Vécu******** : (à remplir)
 
@@ -128,7 +128,7 @@ public Isbn {
     Objects.requireNonNull(value);
     value = value.replaceAll("-", "");
 }
-********************Piège******************** : on ne peut pas réassigner un composant en dehors du compact constructor.
+**********************Piège********************** : on ne peut pas réassigner un composant en dehors du compact constructor.
 
 ********Vécu******** : (à remplir)
 
@@ -137,7 +137,7 @@ public Isbn {
 
 ********************R courte******************** : Un record est implicitement final. On ne peut pas le déclarer final explicitement.
 
-********************Piège******************** : c'est pour cette raison qu'un record ne peut pas être proxyfié par Hibernate.
+**********************Piège********************** : c'est pour cette raison qu'un record ne peut pas être proxyfié par Hibernate.
 
 ********Vécu******** : (à remplir)
 
@@ -150,7 +150,7 @@ public Isbn {
 
 **************java**************
 public record Email(String value) {}
-********************Piège******************** : un record à un composant n'est pas un wrapper — c'est un type à part entière.
+**********************Piège********************** : un record à un composant n'est pas un wrapper — c'est un type à part entière.
 
 ********Vécu******** : (à remplir)
 
@@ -161,7 +161,7 @@ public record Email(String value) {}
 
 Alternative : utiliser un record pour les DTO, une classe pour les entités.
 
-********************Piège******************** : depuis Hibernate 6.2, on peut utiliser des records dans les projections JPQL, mais pas comme entités.
+**********************Piège********************** : depuis Hibernate 6.2, on peut utiliser des records dans les projections JPQL, mais pas comme entités.
 }
 
 ## **************java************** — Records (suite) & divers
@@ -187,7 +187,7 @@ List.of() est immuable (refuse null). Arrays.asList() est de taille fixe mais pe
 ****************java****************
 List<String> immutable = List.of("a", "b");     // set() → UnsupportedOperationException
 List<String> fixed = Arrays.asList("a", "b");   // set() OK, add() → UnsupportedOperationException
-**********************Piège********************** 
+************************Piège************************ 
  List.of() lève NullPointerException si un élément est null. Arrays.asList() accepte les nulls.
  
  ### Q 16  Quand utiliser List.copyOf() ? ?
@@ -199,7 +199,7 @@ public record Team(String name, List<String> members) {
         members = List.copyOf(members);   // copie défensive
     }
 }
-**********************Piège**********************
+************************Piège************************
  sans List.copyOf(), l'appelant peut modifier la liste après le constructeur.
  
  
@@ -216,7 +216,7 @@ double a une précision binaire limitée (0.1 + 0.2 ≠ 0.3). BigDecimal a une p
  ********Exemple********
  System.out.println(0.1 + 0.2);                  // 0.30000000000000004
 System.out.println(new BigDecimal("0.1").add(new BigDecimal("0.2")));  // 0.3
-**********************Piège**********************
+************************Piège************************
 toujours construire un BigDecimal depuis une String, jamais depuis un double :
  ********Exemple********
  new BigDecimal(0.1);      // ❌ 0.1000000000000000055...
@@ -230,7 +230,7 @@ Currency.getInstance("XXX");   // IllegalArgumentException
 Currency.getInstance("eu");    // IllegalArgumentException (case-sensitive)
 **Piege**
 c'est un point d'entrée sensible. Valider les codes devise côté API (enum ou liste blanche).
-### Q 20. Record avec BigDecimal — ********************Piège******************** equals sur scale
+### Q 20. Record avec BigDecimal — **********************Piège********************** equals sur scale
 ********************R courte******************** :
 BigDecimal.equals() compare valeur ET scale. new BigDecimal("1.0").equals(new BigDecimal("1.00")) est false !
 ** ******Exemple****** **
@@ -284,7 +284,7 @@ public enum BookStatus {
 **************java**************
 public sealed interface Shape permits Circle, Rectangle {}
 
-**********************Piège********************** : les sous-types doivent être dans le même module ou le même package (si module-less).
+************************Piège************************ : les sous-types doivent être dans le même module ou le même package (si module-less).
 
 ### Q 25. Différence entre sealed, final, non-sealed ?
 ********************R courte******************** :
@@ -295,7 +295,7 @@ sealed : extension limitée à une liste explicite (permits)
 
 non-sealed : extension libre (désactive le sceau pour un sous-type)
 
-**********************Piège********************** : un sous-type d'une classe sealed doit être déclaré final, sealed ou non-sealed
+************************Piège************************ : un sous-type d'une classe sealed doit être déclaré final, sealed ou non-sealed
 
 ### Q 26. Pourquoi utiliser un record comme DTO ?
 ********************R courte******************** : Immuable, concis, equals/hashCode automatiques, idéal pour transporter des données entre couches (contrôleur ↔ service ↔ client).
@@ -305,13 +305,13 @@ non-sealed : extension libre (désactive le sceau pour un sous-type)
 **************java**************
 public record BookDto(Long id, String title) {}
 
-**********************Piège********************** : un record n'est pas adapté aux entités JPA (Hibernate a besoin de proxyfié, et un record est final).
+************************Piège************************ : un record n'est pas adapté aux entités JPA (Hibernate a besoin de proxyfié, et un record est final).
 
 ###Q 27. Où valider : DTO ou entité ?
 
 ********************R courte******************** : Les deux, mais différemment. Le DTO valide la forme (champs requis, format). L'entité valide les invariants métier (unicité, cohérence).
 
-**********************Piège********************** : ne pas dupliquer la même validation aux deux endroits. Le DTO assure que l'input est propre, l'entité assure l'intégrité.
+************************Piège************************ : ne pas dupliquer la même validation aux deux endroits. Le DTO assure que l'input est propre, l'entité assure l'intégrité.
 
 
 ### Q 28. Qu'est-ce que le pattern matching instanceof ?
@@ -324,7 +324,7 @@ public record BookDto(Long id, String title) {}
 if (notification instanceof EmailNotification email) {
     System.out.println(email.email());
 }
-**********************Piège********************** : la variable email n'existe que dans la branche où le test est vrai (flow scoping).
+************************Piège************************ : la variable email n'existe que dans la branche où le test est vrai (flow scoping).
 
 ###Q 29. Switch expression sur enum ?
 
@@ -339,7 +339,7 @@ String label = switch (status) {
     case RESERVED -> "Réservé";
     case LOST, MAINTENANCE -> "Indisponible";
 };
-**********************Piège********************** : -> (arrow) remplace : et break. Pas de fall-through possible.
+************************Piège************************ : -> (arrow) remplace : et break. Pas de fall-through possible.
 
 
 ---
@@ -350,7 +350,7 @@ String label = switch (status) {
 
 ********************R courte******************** : `ArrayList` = tableau dynamique, accès index O(1), insertion fin O(1) amorti. `LinkedList` = liste doublement chaînée, insertion milieu O(1) si nœud connu, accès O(n).
 
-**********************Piège********************** : dans 95 % des cas, `ArrayList` est plus rapide (cache-friendly). Ne pas choisir `LinkedList` sur la seule théorie.
+************************Piège************************ : dans 95 % des cas, `ArrayList` est plus rapide (cache-friendly). Ne pas choisir `LinkedList` sur la seule théorie.
 
 **********Vécu********** : (à remplir)
 
@@ -360,7 +360,7 @@ String label = switch (status) {
 
 ********************R courte******************** : `HashMap` = O(1) amorti, pas d'ordre. `TreeMap` = O(log n), clés triées, navigation (`floorKey`, `ceilingKey`).
 
-**********************Piège********************** : `TreeMap` exige que les clés soient `Comparable` ou un `Comparator` fourni. Un `compareTo` incohérent avec `equals` produit des comportements étranges.
+************************Piège************************ : `TreeMap` exige que les clés soient `Comparable` ou un `Comparator` fourni. Un `compareTo` incohérent avec `equals` produit des comportements étranges.
 
 **********Vécu********** : (à remplir)
 
@@ -370,7 +370,7 @@ String label = switch (status) {
 
 ********************R courte******************** : `EnumMap` utilise un tableau indexé par `ordinal`. Plus compact, plus rapide, ordre de déclaration naturel.
 
-**********************Piège********************** : toujours préférer `EnumMap` quand les clés sont une enum. Pour les sets, utiliser `EnumSet`.
+************************Piège************************ : toujours préférer `EnumMap` quand les clés sont une enum. Pour les sets, utiliser `EnumSet`.
 
 **********Vécu********** : (à remplir)
 
@@ -389,7 +389,7 @@ list.removeIf(String::isEmpty);                          // ✅
 ### Q34. Différence entre fail-fast et fail-safe ?
 ********************R courte******************** : fail-fast (ArrayList) = détecte la modification, lève CME. fail-safe (CopyOnWriteArrayList) = snapshot, pas d'exception, modifications invisibles.
 
-**********************Piège********************** : CopyOnWriteArrayList copie tout à chaque écriture → inadapté aux écritures fréquentes.
+************************Piège************************ : CopyOnWriteArrayList copie tout à chaque écriture → inadapté aux écritures fréquentes.
 
 
 ### Q35. Qu'est-ce que PriorityQueue ?
@@ -397,18 +397,18 @@ list.removeIf(String::isEmpty);                          // ✅
 
 ********Exemple******** :
 PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.reverseOrder());
-********************Piège******************** : peek() renvoie le plus petit (ou plus grand selon le comparator), mais forEach() renvoie dans un ordre arbitraire.
+**********************Piège********************** : peek() renvoie le plus petit (ou plus grand selon le comparator), mais forEach() renvoie dans un ordre arbitraire.
 
 ### Q36. Différence entre Stack et ArrayDeque ?
 ********************R courte******************** : Stack étend Vector (synchronisé, legacy). ArrayDeque est plus rapide, non synchronisé, API Deque claire (push/pop/offer/poll aux deux bouts).
 
-**********************Piège********************** : Stack est un anti-pattern. Toujours préférer ArrayDeque.
+************************Piège************************ : Stack est un anti-pattern. Toujours préférer ArrayDeque.
 
 
 ### Q37. Comment rendre une collection immuable ?
 ********************R courte******************** : List.copyOf(), Set.copyOf(), Map.copyOf() (**************java************** 10+) → copie défensive + immuable. Refuse null.
 
-**********************Piège********************** : Collections.unmodifiableList() est une vue — si la liste source change, la vue change aussi. Pas une copie.
+************************Piège************************ : Collections.unmodifiableList() est une vue — si la liste source change, la vue change aussi. Pas une copie.
 
 
 ## **************java************** — Streams & Lambda
@@ -423,18 +423,18 @@ orders.stream().map(o -> o.items().stream());
 
 // flatMap → Stream<Item>
 orders.stream().flatMap(o -> o.items().stream());
-********************Piège******************** : si vous écrivez map et obtenez un Stream<Stream<...>>, c'est flatMap qu'il fallait utiliser.
+**********************Piège********************** : si vous écrivez map et obtenez un Stream<Stream<...>>, c'est flatMap qu'il fallait utiliser.
 
 
 ### Q39. reduce vs collect — quand utiliser l'un ou l'autre ?
 ********************R courte******************** : reduce pour des valeurs immuables (somme, min, max). collect pour accumuler dans une structure mutable (List, Map, StringBuilder).
 
-**********************Piège********************** : reduce avec un accumulateur mutable partagé = race condition en parallèle. Utiliser collect avec un supplier frais par partition.
+************************Piège************************ : reduce avec un accumulateur mutable partagé = race condition en parallèle. Utiliser collect avec un supplier frais par partition.
 
 ### Q40. findFirst vs findAny ?
 ********************R courte******************** : findFirst = déterministe, respecte l'ordre d'encounter. findAny = autorise une optimisation en parallèle, résultat non déterministe.
 
-**********************Piège********************** : sur un stream parallèle ordonné, findFirst coûte cher. Préférer findAny quand l'ordre n'importe pas.
+************************Piège************************ : sur un stream parallèle ordonné, findFirst coûte cher. Préférer findAny quand l'ordre n'importe pas.
 
 ### Q41. Pourquoi les Streams sont-ils lazy ?
 ** ******************R courte******************** : Les opérations intermédiaires ne s'exécutent pas tant qu'aucune opération terminale n'est appelée. Permet les optimisations (short-circuit, fusion d'opérations).
@@ -444,10 +444,10 @@ orders.stream().flatMap(o -> o.items().stream());
 **************java**************
 Stream.of(1, 2, 3).filter(x -> { System.out.println(x); return true; });
 // Rien ne s'affiche : pas d'opération terminale
-**********************Piège********************** : oublier l'opération terminale = pipeline jamais exécuté, aucune erreur.
+************************Piège************************ : oublier l'opération terminale = pipeline jamais exécuté, aucune erreur.
 
 
-### Q42. Collectors.toMap — ********************Piège********************s ?
+### Q42. Collectors.toMap — **********************Piège**********************s ?
 ********************R courte******************** : Lève IllegalStateException si clé dupliquée (sans merge function). Lève NullPointerException si valeur null.
 
 ********Exemple******** :
@@ -458,7 +458,7 @@ Stream.of(1, 2, 3).filter(x -> { System.out.println(x); return true; });
     Book::title,
     (a, b) -> a    // merge : garder le premier
 ));
-**********************Piège********************** : toujours fournir une merge function si les clés peuvent être dupliquées. toMap refuse null en valeur.
+************************Piège************************ : toujours fournir une merge function si les clés peuvent être dupliquées. toMap refuse null en valeur.
 
 ### Q43. groupingBy avec downstream — à quoi ça sert ?
 ********************R courte******************** : Le 2ᵉ argument est un collector appliqué à chaque groupe. Permet de compter, moyenner, mapper à l'intérieur de chaque groupe.
@@ -471,7 +471,7 @@ Map<String, Long> countByAuthor = books.stream()
         Book::author,
         Collectors.counting()
     ));
-**********************Piège********************** : par défaut, groupingBy retourne List<T>. Utiliser un downstream (counting(), mapping(), averagingInt()) pour transformer.
+************************Piège************************ : par défaut, groupingBy retourne List<T>. Utiliser un downstream (counting(), mapping(), averagingInt()) pour transformer.
 
 ### Q44. Pourquoi éviter les effets de bord dans map/filter ?
 ********************R courte******************** : Les opérations intermédiaires doivent être pures. Sinon → résultats non déterministes en parallèle, incompatibilité avec les optimisations du framework.
@@ -484,12 +484,12 @@ stream.map(x -> { counter.incrementAndGet(); return x * 2; });
 
 // ✅ Utiliser un collector ou compter en sortie
 long count = stream.count();
-**********************Piège********************** : peek est prévu pour le debug, pas pour la logique métier
+************************Piège************************ : peek est prévu pour le debug, pas pour la logique métier
 
 ### Q45. Quand utiliser parallelStream ?
 ********************R courte******************** : CPU-bound, gros volumes (milliers+), pas d'effet de bord, opérations associatives. Sinon, l'overhead dépasse le gain.
 
-**********************Piège********************** : parallelStream sur I/O-bound ou petits volumes = plus lent que séquentiel. Toujours mesurer avant.**
+************************Piège************************ : parallelStream sur I/O-bound ou petits volumes = plus lent que séquentiel. Toujours mesurer avant.**
 
 ---
 
@@ -518,7 +518,7 @@ NotificationService service;   // Spring l'a créé et injecté
 
 @Controller / @RestController : couche web
 
-**********************Piège********************** : @Repository active la traduction des exceptions JPA (DataAccessException). Pas les autres.
+************************Piège************************ : @Repository active la traduction des exceptions JPA (DataAccessException). Pas les autres.
 
 ### Q48. Injection par constructeur vs par champ vs par setter ?
 ********************R courte******************** :
@@ -537,7 +537,7 @@ public BookService(BookRepository repo) { this.repo = repo; }
 
 // ❌ Champ
 @Autowired private BookRepository repo;
-**********************Piège********************** : l'injection par champ ne permet pas l'utilisation du mot-clé final sur la dépendance.
+************************Piège************************ : l'injection par champ ne permet pas l'utilisation du mot-clé final sur la dépendance.
 
 ### Q49. @Configuration + @Bean vs @Component ?
 ********************R courte******************** :
@@ -548,7 +548,7 @@ public BookService(BookRepository repo) { this.repo = repo; }
 
 Quand utiliser @Bean : quand vous ne pouvez pas annoter la classe (ex: Clock, String, librairie tierce).
 
-**********************Piège********************** : une méthode @Bean dans une classe @Configuration est proxifiée — Spring garantit qu'elle renvoie toujours le même singleton.
+************************Piège************************ : une méthode @Bean dans une classe @Configuration est proxifiée — Spring garantit qu'elle renvoie toujours le même singleton.
 
 ### Q50. @Value — comment l'utiliser ?
 ********************R courte******************** : Injecte une valeur depuis application.yml / application.properties ou une variable d'environnement.
@@ -558,7 +558,7 @@ Quand utiliser @Bean : quand vous ne pouvez pas annoter la classe (ex: Clock, St
 **************java**************
 @Value("${bookhub.greeting.message:Hello}")
 private String message;
-**********************Piège********************** : syntaxe ${clé:valeur_par_défaut}. Sans valeur par défaut, si la clé est absente → IllegalArgumentException au démarrage.
+************************Piège************************ : syntaxe ${clé:valeur_par_défaut}. Sans valeur par défaut, si la clé est absente → IllegalArgumentException au démarrage.
 
 
 ### Q51. Qu'est-ce que @PostConstruct / @PreDestroy ?
@@ -570,14 +570,14 @@ private String message;
 
 Utile pour : ouvrir/fermer des ressources, initialiser des caches, logger le démarrage.
 
-**********************Piège********************** : en **************java************** 17, ces annotations viennent de jakarta.annotation (avant : **************java**************x.annotation).
+************************Piège************************ : en **************java************** 17, ces annotations viennent de jakarta.annotation (avant : **************java**************x.annotation).
 
 ### Q52. Qu'est-ce qu'un bean singleton par défaut ?
 ********************R courte******************** : Un bean Spring est singleton par défaut : une seule instance partagée par toute l'application.
 
 **Autres scopes** : prototype (nouvelle instance à chaque demande), request, session (web).
 
-**********************Piège********************** : un singleton ne doit jamais avoir d'état mutable partagé. Sinon → problèmes de concurrence.
+************************Piège************************ : un singleton ne doit jamais avoir d'état mutable partagé. Sinon → problèmes de concurrence.
 
 ### Q53. Qu'est-ce que ApplicationContext ?
 ********************R courte******************** : Le conteneur IoC de Spring. Il gère le cycle de vie des beans, l'injection des dépendances, la résolution des propriétés.
@@ -587,7 +587,7 @@ Utile pour : ouvrir/fermer des ressources, initialiser des caches, logger le dé
 **************java**************
 ApplicationContext ctx = new AnnotationConfigApplicationContext(AppConfig.class);
 GreetingService service = ctx.getBean(GreetingService.class);
-**********************Piège********************** : en Spring Boot, l'ApplicationContext est créé automatiquement par SpringApplication.run(). On n'a pas besoin de l'instancier à la main.
+************************Piège************************ : en Spring Boot, l'ApplicationContext est créé automatiquement par SpringApplication.run(). On n'a pas besoin de l'instancier à la main.
 
 ---
 
@@ -597,7 +597,7 @@ GreetingService service = ctx.getBean(GreetingService.class);
 
 ********************R courte******************** : `@Controller` retourne une vue (HTML). `@RestController` = `@Controller` + `@ResponseBody` sur chaque méthode → retourne du JSON/XML directement.
 
-**********************Piège********************** : avec `@Controller`, il faut `@ResponseBody` sur chaque méthode pour retourner du JSON.
+************************Piège************************ : avec `@Controller`, il faut `@ResponseBody` sur chaque méthode pour retourner du JSON.
 
 **********Vécu********** : (à remplir)
 
@@ -613,7 +613,7 @@ public Book getById(@PathVariable Long id) { ... }
 
 @GetMapping                               // /books?status=AVAILABLE
 public List<Book> list(@RequestParam String status) { ... }
-**********************Piège********************** : @RequestParam a un attribut required=true par défaut. Pour rendre optionnel : @RequestParam(required = false)
+************************Piège************************ : @RequestParam a un attribut required=true par défaut. Pour rendre optionnel : @RequestParam(required = false)
 
 
 ### Q56. Que signifie ResponseEntity<T> ?
@@ -625,7 +625,7 @@ public List<Book> list(@RequestParam String status) { ... }
 return ResponseEntity
     .created(URI.create("/api/books/" + id))
     .body(createdBook);
-**********************Piège********************** : sans ResponseEntity, le code est toujours 200 (même pour un POST). Utiliser ResponseEntity pour contrôler les codes 201, 204, 404.
+************************Piège************************ : sans ResponseEntity, le code est toujours 200 (même pour un POST). Utiliser ResponseEntity pour contrôler les codes 201, 204, 404.
 
 ### Q57. Comment valider les données entrantes ?
 ********************R courte******************** : Avec @Valid + annotations Bean Validation (@NotNull, @Size, @Email). Les erreurs sont capturées et retournées en 400 par Spring.
@@ -635,7 +635,7 @@ return ResponseEntity
 **************java**************
 @PostMapping
 public Book create(@Valid @RequestBody BookDto dto) { ... }
-**********************Piège********************** : sans @Valid, les validations ne s'exécutent pas. @Valid à mettre avant @RequestBody.
+************************Piège************************ : sans @Valid, les validations ne s'exécutent pas. @Valid à mettre avant @RequestBody.
 
 ### Q58. Que fait @RequestMapping ?
 ********************R courte******************** : Associe une URL à un controller ou à une méthode. Peut être spécialisé : @GetMapping, @PostMapping, etc.
@@ -649,7 +649,7 @@ public class BookController {
     @GetMapping("/{id}")          // → /api/books/{id}
     public Book get(@PathVariable Long id) { ... }
 }
-**********************Piège********************** : @RequestMapping sur la classe = préfixe. Les annotations sur les méthodes ajoutent le suffixe.
+************************Piège************************ : @RequestMapping sur la classe = préfixe. Les annotations sur les méthodes ajoutent le suffixe.
 
 ### Q59. Comment retourner un code 201 (Created) ?
 ********************R courte******************** : Utiliser ResponseEntity.created(URI). Le Location header indique l'URL de la ressource créée.
@@ -660,7 +660,7 @@ public class BookController {
 return ResponseEntity
     .created(URI.create("/api/books/" + id))
     .body(book);
-**********************Piège********************** : renvoyer ResponseEntity.ok(book) pour un POST = code 200 au lieu de 201. Non conforme REST.
+************************Piège************************ : renvoyer ResponseEntity.ok(book) pour un POST = code 200 au lieu de 201. Non conforme REST.
 
 
 ### Q60. Comment tester un controller sans démarrer le serveur ?
@@ -678,7 +678,7 @@ class BookControllerTest {
         mockMvc.perform(get("/api/books")).andExpect(status().isOk());
     }
 }
-**********************Piège********************** : @WebMvcTest ne charge pas les autres couches (services, repositories). Il faut @MockBean pour les dépendances.
+************************Piège************************ : @WebMvcTest ne charge pas les autres couches (services, repositories). Il faut @MockBean pour les dépendances.
 
 ### Q61. Que fait @RequestBody ?
 ********************R courte******************** : Désérialise le body HTTP (JSON) en objet **************java**************, via Jackson.
@@ -688,7 +688,7 @@ class BookControllerTest {
 **************java**************
 @PostMapping
 public Book create(@RequestBody BookDto dto) { ... }
-**********************Piège********************** : si le JSON est mal formé → HttpMessageNotReadableException → code 400. Sans @RequestBody, Spring ne peut pas mapper le body.
+************************Piège************************ : si le JSON est mal formé → HttpMessageNotReadableException → code 400. Sans @RequestBody, Spring ne peut pas mapper le body.
 
 ## Spring — REST avancé
 
@@ -703,7 +703,7 @@ public Page<BookDto> listAll(@PageableDefault(size = 10, sort = "title") Pageabl
     return service.findAll(pageable);
 }
 
-**********************Piège********************** : Page<T> retourne content, totalElements, totalPages, number, size. Ce n'est pas une simple List
+************************Piège************************ : Page<T> retourne content, totalElements, totalPages, number, size. Ce n'est pas une simple List
 
 
 ### Q63. Différence entre Page<T>, Slice<T> et List<T> ?
@@ -715,7 +715,7 @@ Slice<T> : indique s'il y a une page suivante (hasNext)
 
 Page<T> : + total d'éléments, total de pages
 
-**********************Piège********************** : Page<T> fait un count() supplémentaire. Slice<T> est plus rapide quand on n'a pas besoin du total.
+************************Piège************************ : Page<T> fait un count() supplémentaire. Slice<T> est plus rapide quand on n'a pas besoin du total.
 
 ### Q64. Comment gérer les erreurs globalement ?
 ********************R courte******************** : Avec @RestControllerAdvice + @ExceptionHandler. Chaque handler mappe une exception → réponse HTTP.
@@ -728,7 +728,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BookNotFoundException.class)
     public ProblemDetail handle(BookNotFoundException ex) { ... }
 }
-**********************Piège********************** : sans @RestControllerAdvice, il faut try/catch dans chaque controller (verbeux). Les exceptions non gérées → 500.
+************************Piège************************ : sans @RestControllerAdvice, il faut try/catch dans chaque controller (verbeux). Les exceptions non gérées → 500.
 
 ### Q65. Qu'est-ce que le RFC 7807 (ProblemDetail) ?
 ********************R courte******************** : Standard IETF pour les erreurs API REST. Champs : type, title, status, detail, instance. Spring 6 l'implémente via ProblemDetail.
@@ -743,13 +743,13 @@ json
   "detail": "Book not found with id: 999",
   "bookId": 999
 }
-**********************Piège********************** : type est une URI documentant la classe d'erreur. detail est le message spécifique. bookId est un champ custom.
+************************Piège************************ : type est une URI documentant la classe d'erreur. detail est le message spécifique. bookId est un champ custom.
 
 ### Q66. Quand lever une exception vs retourner ResponseEntity.notFound() ?
 ********************R courte******************** : 
 Lever une exception dès que la logique métier ne peut pas continuer. Le handler global s'occupe de la réponse HTTP. C'est plus lisible et centralisé.
 
-**********************Piège********************** : ResponseEntity.notFound() dans chaque méthode = duplication. La bonne pratique est orElseThrow(() -> new BookNotFoundException(id)).
+************************Piège************************ : ResponseEntity.notFound() dans chaque méthode = duplication. La bonne pratique est orElseThrow(() -> new BookNotFoundException(id)).
 
 ### Q67. Comment valider un DTO entrant ?
 ********************R courte******************** : @Valid + annotations Bean Validation (@NotNull, @Size, @Email). En cas d'erreur, Spring retourne un 400 automatique.
@@ -759,7 +759,7 @@ Lever une exception dès que la logique métier ne peut pas continuer. Le handle
 **************java**************
 @PostMapping
 public Book create(@Valid @RequestBody BookDto dto) { ... }
-**********************Piège********************** : sans @Valid, les annotations sont ignorées. @Valid avant @RequestBody.
+************************Piège************************ : sans @Valid, les annotations sont ignorées. @Valid avant @RequestBody.
 
 ### Q68. Comment trier par plusieurs champs dans une requête paginée ?
 ********************R courte******************** : ?sort=title,asc&sort=price,desc. Spring supporte le multi-tri avec des virgules.
@@ -768,12 +768,12 @@ public Book create(@Valid @RequestBody BookDto dto) { ... }
 
 text
 GET /api/books?page=0&size=10&sort=author,asc&sort=title,asc
-**********************Piège********************** : le tri sur des champs JPA doit correspondre aux noms de colonnes/propriétés. Les champs non triables doivent être rejetés (**Sécurité**).
+************************Piège************************ : le tri sur des champs JPA doit correspondre aux noms de colonnes/propriétés. Les champs non triables doivent être rejetés (**Sécurité**).
 
 ### Q69. Pourquoi utiliser Pageable plutôt que page + size bruts ?
 ********************R courte******************** : Pageable encapsule page, size, sort. Spring le construit automatiquement depuis les query params. Testable, réutilisable, cohérent avec Spring Data JPA.
 
-**********************Piège********************** : avec Pageable, le tri par défaut peut être manipulé par le client. Restreindre les champs triables en production.**
+************************Piège************************ : avec Pageable, le tri par défaut peut être manipulé par le client. Restreindre les champs triables en production.**
 
 
 ---
@@ -784,7 +784,7 @@ GET /api/books?page=0&size=10&sort=author,asc&sort=title,asc
 
 ********************R courte******************** : **Sécurité** et clarté. Le client ne doit pas pouvoir envoyer un `id` sur POST, ni recevoir des champs internes.
 
-**********************Piège********************** : exposer directement l'entité JPA → fuite de données, couplage fort, **Sécurité** cassée.
+************************Piège************************ : exposer directement l'entité JPA → fuite de données, couplage fort, **Sécurité** cassée.
 
 **********Vécu********** : (à remplir)
 
@@ -803,33 +803,33 @@ public record CreateBookRequest(
 
 @PostMapping
 public BookResponse create(@Valid @RequestBody CreateBookRequest request) { ... }
-**********************Piège********************** : sans @Valid, les annotations sont ignorées.
+************************Piège************************ : sans @Valid, les annotations sont ignorées.
 
 ### Q72. Différence entre @NotNull, @NotEmpty et @NotBlank ?
 ********************R courte******************** : @NotNull refuse null. @NotEmpty refuse null + vide. @NotBlank refuse null + vide + espaces seuls.
 
-**********************Piège********************** : pour les chaînes utilisateur, préférer @NotBlank.
+************************Piège************************ : pour les chaînes utilisateur, préférer @NotBlank.
 
 ### Q73. Comment gérer les erreurs de validation ?
 ********************R courte******************** : MethodArgumentNotValidException est levée par Spring. On l'intercepte dans @RestControllerAdvice pour retourner un ProblemDetail avec les erreurs par champ.
 
-**********************Piège********************** : le JSON retourné doit être exploitable par le client (champ → message).
+************************Piège************************ : le JSON retourné doit être exploitable par le client (champ → message).
 
 
 ### Q74. Pourquoi utiliser un Mapper ?
 ********************R courte******************** : Convertir entre les couches (Entity ↔ DTO ↔ Domain). Évite la duplication, centralise la transformation.
 
-**********************Piège********************** : ne pas mettre la logique métier dans le mapper.
+************************Piège************************ : ne pas mettre la logique métier dans le mapper.
 
 ### Q75. Que fait @Valid en cascade ?
 ********************R courte******************** : Si un DTO contient un objet avec @Valid, Spring valide récursivement les champs imbriqués.
 
-**********************Piège********************** : sans @Valid sur le champ imbriqué, la validation ne descend pas.
+************************Piège************************ : sans @Valid sur le champ imbriqué, la validation ne descend pas.
 
 ### Q76. Comment tester une API REST complète ?
 ********************R courte******************** : @SpringBootTest + @AutoConfigureMockMvc. Charge tout le contexte et simule des requêtes HTTP.
 
-**********************Piège********************** : plus lent que @WebMvcTest. À réserver aux scénarios bout-en-bout.
+************************Piège************************ : plus lent que @WebMvcTest. À réserver aux scénarios bout-en-bout.
 
 ### Q77. Différence entre test unitaire et test d'intégration ?
 ********************R courte******************** : Unitaire = une classe isolée (mock). Intégration = plusieurs couches (controller + service + BDD). Ratio recommandé : 80 % unitaires / 20 % intégration.
@@ -842,7 +842,7 @@ public BookResponse create(@Valid @RequestBody CreateBookRequest request) { ... 
 
 ********************R courte******************** : JPA (Jakarta Persistence API) est une **spécification** pour la persistance objet-relationnel (ORM). Hibernate est l'implémentation la plus utilisée.
 
-**********************Piège********************** : JPA ≠ Hibernate. JPA est l'API standard, Hibernate l'implémentation. Utiliser JPA permet la portabilité (passer à EclipseLink sans réécrire).
+************************Piège************************ : JPA ≠ Hibernate. JPA est l'API standard, Hibernate l'implémentation. Utiliser JPA permet la portabilité (passer à EclipseLink sans réécrire).
 
 **********Vécu********** : (à remplir)
 
@@ -874,7 +874,7 @@ TABLE : table dédiée (lent, à éviter)
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 private Long id;
-**********************Piège********************** : IDENTITY ne permet pas le batching JDBC (moins performant pour les INSERT massifs). Préférer SEQUENCE pour les gros volumes.
+************************Piège************************ : IDENTITY ne permet pas le batching JDBC (moins performant pour les INSERT massifs). Préférer SEQUENCE pour les gros volumes.
 
 ### Q81. @Enumerated — STRING vs ORDINAL ?
 ********************R courte******************** : EnumType.STRING stocke "AVAILABLE". ORDINAL stocke la position (0).
@@ -884,7 +884,7 @@ private Long id;
 **************java**************
 @Enumerated(EnumType.STRING)
 private BookStatus status;
-**********************Piège********************** : toujours préférer STRING. Réordonner un enum avec ORDINAL casse les données existantes (les entiers ne correspondent plus).
+************************Piège************************ : toujours préférer STRING. Réordonner un enum avec ORDINAL casse les données existantes (les entiers ne correspondent plus).
 
 ### Q82. Comment fonctionne JpaRepository ?
 ********************R courte******************** : Spring Data génère l'implémentation à la compilation. CRUD fourni gratuitement. Les requêtes dérivées (findByIsbn, existsByTitle) sont parsées depuis le nom de la méthode.
@@ -897,7 +897,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     boolean existsByIsbn(String isbn);
     List<Book> findByAuthorContainingIgnoreCase(String author);
 }
-**********************Piège********************** : respecter la convention findBy<Property>, existsBy<Property>. Sinon erreur au démarrage de Spring.
+************************Piège************************ : respecter la convention findBy<Property>, existsBy<Property>. Sinon erreur au démarrage de Spring.
 
 ### Q83. Qu'est-ce que @Transactional ?
 ********************R courte******************** : Démarre une transaction autour de la méthode. Rollback automatique sur exception unchecked (RuntimeException). readOnly = true optimise les lectures (pas de dirty checking).
@@ -913,7 +913,7 @@ public class BookService {
     @Transactional
     public BookDto create(BookDto dto) { ... }
 }
-**********************Piège********************** : les appels internes (this.method()) ne déclenchent pas la transaction. Spring utilise un proxy — l'appel doit venir de l'extérieur du bean.
+************************Piège************************ : les appels internes (this.method()) ne déclenchent pas la transaction. Spring utilise un proxy — l'appel doit venir de l'extérieur du bean.
 
 ### Q84. À quoi servent @PrePersist et @PreUpdate ?
 ********************R courte******************** : Callbacks JPA appelés avant l'insertion (@PrePersist) ou la mise à jour (@PreUpdate). Utiles pour timestamps, audit, valeurs par défaut.
@@ -932,7 +932,7 @@ void onCreate() {
 void onUpdate() {
     this.updatedAt = Instant.now();
 }
-**********************Piège********************** : si un champ est nullable = false, il doit être rempli dans @PrePersist, sinon erreur à l'INSERT.
+************************Piège************************ : si un champ est nullable = false, il doit être rempli dans @PrePersist, sinon erreur à l'INSERT.
 
 ### Q85. Pourquoi un constructeur protected Book() {} ?
 ********************R courte******************** : JPA a besoin d'un constructeur sans arguments pour créer des proxies et instancier les entités au chargement depuis la BDD.
@@ -946,7 +946,7 @@ public class Book {
 
     public Book(String title, ...) { ... }
 }
-**********************Piège********************** : protected suffit et empêche l'instanciation accidentelle par le code métier. public serait trop permissif.
+************************Piège************************ : protected suffit et empêche l'instanciation accidentelle par le code métier. public serait trop permissif.
 
 ### ---
 
@@ -967,7 +967,7 @@ private Author author;
 @OneToMany(mappedBy = "author")
 private List<Book> books = new ArrayList<>();
 
-**********************Piège********************** : la FK est dans la table du côté @ManyToOne. mappedBy indique qui possède la relation.
+************************Piège************************ : la FK est dans la table du côté @ManyToOne. mappedBy indique qui possède la relation.
 
 ### Q87. Pourquoi toujours mettre fetch = LAZY sur @ManyToOne ?
 ********************R courte******************** : Par défaut EAGER → charge Author à chaque lecture de Book → problème N+1.
@@ -978,7 +978,7 @@ private List<Book> books = new ArrayList<>();
 @ManyToOne(fetch = FetchType.LAZY)
 @JoinColumn(name = "author_id")
 private Author author;
-**********************Piège********************** : avec LAZY, appeler book.getAuthor().getName() hors transaction → LazyInitializationException.
+************************Piège************************ : avec LAZY, appeler book.getAuthor().getName() hors transaction → LazyInitializationException.
 
 
 ### Q88. Qu'est-ce que mappedBy ?
@@ -989,13 +989,13 @@ private Author author;
 ****************java****************
 @OneToMany(mappedBy = "author")   // "author" = champ dans Book
 private List<Book> books;
-**********************Piège********************** : sans mappedBy, JPA crée une table de jointure intermédiaire (au lieu d'utiliser la FK).
+************************Piège************************ : sans mappedBy, JPA crée une table de jointure intermédiaire (au lieu d'utiliser la FK).
 
 
 ### Q89. Cascade JPA — quoi et quand ?
 ******************R courte****************** : Propage une opération du parent vers ses enfants. CascadeType.ALL = tout (PERSIST, MERGE, REMOVE, REFRESH, DETACH).
 
-**********************Piège********************** : CascadeType.REMOVE sur @ManyToOne supprime l'auteur quand on supprime un livre — à éviter.
+************************Piège************************ : CascadeType.REMOVE sur @ManyToOne supprime l'auteur quand on supprime un livre — à éviter.
 
 
 ### Q90. orphanRemoval = true — à quoi ça sert ?
@@ -1006,7 +1006,7 @@ private List<Book> books;
 ****************java****************
 @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
 private List<Book> books;
-**********************Piège********************** : à réserver aux relations fortes (Commande → Lignes). Un Book ne doit pas être supprimé parce qu'on retire l'auteur.
+************************Piège************************ : à réserver aux relations fortes (Commande → Lignes). Un Book ne doit pas être supprimé parce qu'on retire l'auteur.
 
 ### Q91. Que fait @JoinColumn ?
 ********************R courte********************: Nomme la colonne FK sur le côté propriétaire.
@@ -1017,7 +1017,7 @@ private List<Book> books;
 @ManyToOne
 @JoinColumn(name = "author_id", nullable = false)
 private Author author;
-**********************Piège********************** : toujours l'expliciter pour lisibilité et migrations Flyway.
+************************Piège************************ : toujours l'expliciter pour lisibilité et migrations Flyway.
 
 
 ### Q92. Problème N+1 — qu'est-ce que c'est ?
@@ -1033,7 +1033,7 @@ List<Book> findAllWithAuthor();
 ****************java****************
 @EntityGraph(attributePaths = "author")
 List<Book> findAll();
-**********************Piège********************** : invisible en dev. Toujours vérifier avec show-sql: true.
+************************Piège************************ : invisible en dev. Toujours vérifier avec show-sql: true.
 
 
 ### Q93. CascadeType.ALL — quand l'utiliser ?
@@ -1047,7 +1047,7 @@ List<Book> findAll();
 
 ❌ Article → Auteur
 
-**********************Piège********************** : REMOVE sur relation faible = perte de données catastrophique.
+************************Piège************************ : REMOVE sur relation faible = perte de données catastrophique.
 
 ---
 
@@ -1057,7 +1057,7 @@ List<Book> findAll();
 
 ********************R courte******************** : Charger N entités + N requêtes pour leurs relations. Ex : 1000 livres → 1 requête pour les livres + 1000 pour chaque auteur.
 
-**********************Piège********************** : invisible en dev (petits volumes). Détectable avec `generate_statistics: true` + `Statistics.getPrepareStatementCount()`.
+************************Piège************************ : invisible en dev (petits volumes). Détectable avec `generate_statistics: true` + `Statistics.getPrepareStatementCount()`.
 
 **********Vécu********** : (à remplir)
 
@@ -1074,7 +1074,7 @@ stats.setStatisticsEnabled(true);
 stats.clear();
 // ... exécution
 long count = stats.getPrepareStatementCount();
-********************Piège******************** : show-sql: true affiche les requêtes mais on les compte à la main. getPrepareStatementCount() est programmatique.
+**********************Piège********************** : show-sql: true affiche les requêtes mais on les compte à la main. getPrepareStatementCount() est programmatique.
 
 
 ### Q96. @EntityGraph — comment ça marche ?
@@ -1085,7 +1085,7 @@ long count = stats.getPrepareStatementCount();
 ************java************
 @EntityGraph(attributePaths = "authorEntity")
 Page<Book> findAllWithAuthor(Pageable pageable);
-******************Piège****************** : fonctionne avec Pageable, contrairement à JOIN FETCH.
+********************Piège******************** : fonctionne avec Pageable, contrairement à JOIN FETCH.
 
 
 ### Q97. JOIN FETCH vs @EntityGraph ?
@@ -1095,13 +1095,13 @@ JOIN FETCH : JPQL explicite, 1 requête, ne marche pas avec Pageable
 
 @EntityGraph : annotation, 1 requête (+ count pour Page), marche avec Pageable
 
-******************Piège****************** : JOIN FETCH avec Pageable → Hibernate avertit "firstResult/maxResults specified with collection fetch". Pour Page, utiliser @EntityGraph.
+********************Piège******************** : JOIN FETCH avec Pageable → Hibernate avertit "firstResult/maxResults specified with collection fetch". Pour Page, utiliser @EntityGraph.
 
 
 ### Q98. @Transactional(readOnly = true) — à quoi ça sert ?
 ******************R courte****************** : Hibernate passe en FlushMode.MANUAL → pas de dirty checking, économie de mémoire. La BDD peut optimiser (certaines désactivent le WAL).
 
-******************Piège****************** : à ne jamais mettre sur une méthode qui écrit, sinon les modifications ne sont pas persistées.
+********************Piège******************** : à ne jamais mettre sur une méthode qui écrit, sinon les modifications ne sont pas persistées.
 
 
 ### Q99. Propagation.REQUIRED vs REQUIRES_NEW ?
@@ -1113,7 +1113,7 @@ REQUIRES_NEW : suspend la transaction existante, en crée une nouvelle indépend
 
 **Cas d'usage** REQUIRES_NEW : audit/logging (doit survivre au rollback de l'appelant).
 
-******************Piège****************** : REQUIRES_NEW dans la même classe → l'appel interne ne passe pas par le proxy → pas d'effet.
+********************Piège******************** : REQUIRES_NEW dans la même classe → l'appel interne ne passe pas par le proxy → pas d'effet.
 
 
 ### Q100. Propagation.MANDATORY — quand l'utiliser ?
@@ -1125,7 +1125,7 @@ REQUIRES_NEW : suspend la transaction existante, en crée une nouvelle indépend
 ### Q101. Pourquoi @Transactional sur une méthode privée ne marche pas ?
 ******************R courte****************** : Spring utilise un proxy (JDK ou CGLIB). Les méthodes privées ne sont pas interceptées par le proxy.
 
-******************Piège****************** : même problème pour les auto-invocations (this.otherMethod()). Il faut passer par un autre bean.
+********************Piège******************** : même problème pour les auto-invocations (this.otherMethod()). Il faut passer par un autre bean.
 
 **Solution** : injection de soi-même (@Autowired private BookService self;) ou découper en 2 beans.
 
@@ -1139,7 +1139,7 @@ REQUIRES_NEW : suspend la transaction existante, en crée une nouvelle indépend
 
 **Avantage** : les tests d'intégration utilisent exactement la même version que la production.
 
-******************Piège****************** : nécessite Docker installé sur la machine de CI et en local.
+********************Piège******************** : nécessite Docker installé sur la machine de CI et en local.
 
 **********Vécu********** : (à remplir)
 
@@ -1168,7 +1168,7 @@ REQUIRES_NEW : suspend la transaction existante, en crée une nouvelle indépend
 - `mvn test` → uniquement `*Test`
 - `mvn verify` → `*Test` + `*IT`
 
-******************Piège****************** : nommer vos tests `*IT` sans configurer Failsafe → ils ne se lancent jamais.
+********************Piège******************** : nommer vos tests `*IT` sans configurer Failsafe → ils ne se lancent jamais.
 
 **********Vécu********** : (à remplir)
 
@@ -1197,7 +1197,7 @@ static { POSTGRES.start(); }
 @Container
 @ServiceConnection
 static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
-****************Piège**************** : @ServiceConnection nécessite spring-boot-testcontainers dans le pom.
+******************Piège****************** : @ServiceConnection nécessite spring-boot-testcontainers dans le pom.
 
 ********Vécu******** : (à remplir)
 
@@ -1224,7 +1224,7 @@ Activer les logs Testcontainers : .withLogConsumer(...)
 
 Augmenter le timeout : .withStartupTimeout(Duration.ofSeconds(60))
 
-****************Piège**************** : les tests Testcontainers sont lents la première fois (pull image). Ensuite, ils utilisent le cache local.
+******************Piège****************** : les tests Testcontainers sont lents la première fois (pull image). Ensuite, ils utilisent le cache local.
 
 ### Q109. Limites de Testcontainers ?
 **Limites** :
@@ -1250,7 +1250,7 @@ Bonne pratique : garder la majorité des tests en unitaire rapide (H2/mocks), et
 
 **Alternative **: withReuse(false) → nouveau container à chaque classe, mais 30 s perdues par classe.
 
-****************Piège************** ********Vécu********** : deux classes IT avec le même ISBN → duplicate key parce que le container persiste entre classes.
+******************Piège**************** ********Vécu********** : deux classes IT avec le même ISBN → duplicate key parce que le container persiste entre classes.
 
 ---
 
@@ -1270,7 +1270,7 @@ Bonne pratique : garder la majorité des tests en unitaire rapide (H2/mocks), et
 
 ****************R courte**************** : CSRF attaque les cookies de session. Une API JWT n'utilise pas de cookies → pas de vecteur CSRF.
 
-****************Piège**************** : si vous utilisez des cookies pour le token, remettez CSRF.
+******************Piège****************** : si vous utilisez des cookies pour le token, remettez CSRF.
 
 ---
 
@@ -1282,7 +1282,7 @@ Bonne pratique : garder la majorité des tests en unitaire rapide (H2/mocks), et
 
 **Avantage STATELESS** : pas de sticky session, scale horizontalement.
 
-****************Piège**************** : révocation d'un JWT difficile → blacklist ou token court + refresh.
+******************Piège****************** : révocation d'un JWT difficile → blacklist ou token court + refresh.
 
 ---
 
@@ -1297,7 +1297,7 @@ text
 - **Payload** : claims (sub, exp, iat, authorities…)
 - **Signature** : HMAC du header+payload avec la clé secrète
 
-****************Piège**************** : le payload est **lisible** (base64). Ne jamais y mettre de données sensibles.
+******************Piège****************** : le payload est **lisible** (base64). Ne jamais y mettre de données sensibles.
 
 ---
 
@@ -1310,7 +1310,7 @@ text
 - Salt aléatoire intégré
 - Résistant aux rainbow tables
 
-****************Piège**************** : ne jamais hasher avec SHA-256 seul.
+******************Piège****************** : ne jamais hasher avec SHA-256 seul.
 
 ---
 
@@ -1322,7 +1322,7 @@ text
 
 **Bonne pratique** : tester les 2.
 
-****************Piège**************** : `@WithMockUser` ne teste **pas** `JwtAuthenticationFilter`.
+******************Piège****************** : `@WithMockUser` ne teste **pas** `JwtAuthenticationFilter`.
 
 ---
 
@@ -1361,7 +1361,7 @@ public static PasswordEncoder passwordEncoder() {
 - `@WithMockUser` : tests unitaires de controller (rapide, isolé)
 - `@WithUserDetails` : tests d'intégration avec la vraie config de **Sécurité**
 
-****************Piège**************** : `@WithMockUser` ne détecte pas un bug dans `AppUserDetailsService`.
+******************Piège****************** : `@WithMockUser` ne détecte pas un bug dans `AppUserDetailsService`.
 
 ---
 
@@ -1371,7 +1371,7 @@ public static PasswordEncoder passwordEncoder() {
 - **AuthenticationEntryPoint** : utilisateur **non authentifié** → 401
 - **AccessDeniedHandler** : utilisateur **authentifié** mais sans les droits → 403
 
-****************Piège**************** : par défaut Spring renvoie 403 pour les deux. Une API REST doit distinguer.
+******************Piège****************** : par défaut Spring renvoie 403 pour les deux. Une API REST doit distinguer.
 
 **********Vécu********** : 3 tests échouaient en 401 vs 403 → fix par `HttpStatusEntryPoint` puis handlers JSON custom.
 
@@ -1406,7 +1406,7 @@ public static PasswordEncoder passwordEncoder() {
 
 **Alternative** : `Clock` injectable + `Clock.fixed(...)`.
 
-****************Piège**************** : attendre l'expiration réelle rend le test lent et flaky.
+******************Piège****************** : attendre l'expiration réelle rend le test lent et flaky.
 
 ---
 
@@ -1417,7 +1417,7 @@ public static PasswordEncoder passwordEncoder() {
 - **48 octets** → HS384
 - **64 octets** → HS512
 
-****************Piège**************** : une clé < 32 octets → `WeakKeyException`.
+******************Piège****************** : une clé < 32 octets → `WeakKeyException`.
 
 **********Vécu********** : clé de 64 caractères → header `"alg":"HS512"`, pas `"HS256"`.
 
@@ -1429,7 +1429,7 @@ public static PasswordEncoder passwordEncoder() {
 - **1 test **Sécurité** dédié** par controller (`BookControllerSecurityTest`)
 - **Tests fonctionnels** avec `@WithMockUser` ou `@WithUserDetails` pour ignorer la **Sécurité**
 
-****************Piège**************** : si tous les tests désactivent la **Sécurité** (`addFilters = false`), un bug de config n'est jamais détecté.
+******************Piège****************** : si tous les tests désactivent la **Sécurité** (`addFilters = false`), un bug de config n'est jamais détecté.
 
 ---
 
@@ -1443,7 +1443,7 @@ public static PasswordEncoder passwordEncoder() {
 
 **Avantage** : si l'access token est volé, il expire vite. Le refresh token peut être révoqué.
 
-****************Piège**************** : sans refresh token, soit on accepte des access tokens de 24h (dangereux), soit on force l'utilisateur à se reconnecter souvent.
+******************Piège****************** : sans refresh token, soit on accepte des access tokens de 24h (dangereux), soit on force l'utilisateur à se reconnecter souvent.
 
 ---
 
@@ -1464,7 +1464,7 @@ public static PasswordEncoder passwordEncoder() {
 - être expiré côté serveur
 - être invalidé en cas de vol détecté
 
-****************Piège**************** : coût en I/O DB à chaque refresh.
+******************Piège****************** : coût en I/O DB à chaque refresh.
 
 ---
 
@@ -1496,7 +1496,7 @@ public static PasswordEncoder passwordEncoder() {
 
 **Pour un token très sensible** : `SecureRandom` + Base64 (plus de bits d'entropie).
 
-****************Piège**************** : ne jamais utiliser `Math.random()` pour un token de **Sécurité**.
+******************Piège****************** : ne jamais utiliser `Math.random()` pour un token de **Sécurité**.
 
 ---
 
@@ -1508,7 +1508,7 @@ public static PasswordEncoder passwordEncoder() {
 
 **Avantage** : image finale 4× plus petite, pas d'outils de build en prod.
 
-****************Piège**************** : ne jamais mettre le JDK complet en runtime — inutile et attaque possible via outils de compilation.
+******************Piège****************** : ne jamais mettre le JDK complet en runtime — inutile et attaque possible via outils de compilation.
 
 ---
 
@@ -1518,7 +1518,7 @@ public static PasswordEncoder passwordEncoder() {
 
 **Alternative** : G1GC (défaut) — équilibré, plus classique.
 
-****************Piège**************** : ZGC consomme ~20 % de RAM en plus. Sur un petit container (512 Mo), préférer G1.
+******************Piège****************** : ZGC consomme ~20 % de RAM en plus. Sur un petit container (512 Mo), préférer G1.
 
 ---
 
@@ -1530,7 +1530,7 @@ public static PasswordEncoder passwordEncoder() {
 
 **Avantage Compose** : reproductibilité en 1 commande (`docker-compose up`), réseau automatique, ordre de démarrage.
 
-****************Piège**************** : Compose = dev/staging mono-machine. Pour la prod multi-nœuds → Kubernetes.
+******************Piège****************** : Compose = dev/staging mono-machine. Pour la prod multi-nœuds → Kubernetes.
 
 ---
 
@@ -1548,7 +1548,7 @@ public static PasswordEncoder passwordEncoder() {
 
 **************R courte************** : Compose crée un réseau interne avec DNS automatique. **Le nom du service = hostname**.
 
-****************Piège**************** : `localhost` dans un conteneur pointe vers **lui-même**, pas la machine hôte.
+******************Piège****************** : `localhost` dans un conteneur pointe vers **lui-même**, pas la machine hôte.
 
 ---
 
@@ -1558,7 +1558,7 @@ public static PasswordEncoder passwordEncoder() {
 - `down` : arrête et supprime les conteneurs, **garde les volumes**
 - `down -v` : supprime aussi les volumes → **BDD effacée**
 
-****************Piège************** ********Vécu********** : après `down -v`, la base PostgreSQL est vide → il faut re-seeder.
+******************Piège**************** ********Vécu********** : après `down -v`, la base PostgreSQL est vide → il faut re-seeder.
 
 ---
 
@@ -1596,7 +1596,7 @@ HTTP → CreateBookRequest (String) → BookMapper → Book (domaine) → Entity
 HTTP ← BookResponse (DTO) ← BookMapper ← Book (domaine) ← Entity
 
 
-****************Piège**************** : ne jamais exposer les entités JPA directement (couplage, lazy-loading).
+******************Piège****************** : ne jamais exposer les entités JPA directement (couplage, lazy-loading).
 
 ---
 
@@ -1608,7 +1608,7 @@ HTTP ← BookResponse (DTO) ← BookMapper ← Book (domaine) ← Entity
 
 **Paramètres** : `?page=0&size=10&sort=title,asc` (par défaut Spring Data).
 
-****************Piège**************** : `page` commence à **0** (indices 0-based).
+******************Piège****************** : `page` commence à **0** (indices 0-based).
 
 ---
 
@@ -1632,7 +1632,7 @@ HTTP ← BookResponse (DTO) ← BookMapper ← Book (domaine) ← Entity
 - `CorsConfig.****java****` (WebMvcConfigurer) pour autoriser les origines
 - `.cors(cors -> cors.configure(http))` dans SecurityConfig pour que Spring Security laisse passer les préflight `OPTIONS`
 
-****************Piège**************** : CORS seule ne suffit pas si Spring Security bloque en amont.
+******************Piège****************** : CORS seule ne suffit pas si Spring Security bloque en amont.
 
 ---
 
@@ -1648,7 +1648,7 @@ HTTP ← BookResponse (DTO) ← BookMapper ← Book (domaine) ← Entity
 **En production** : cookie httpOnly + SameSite=Strict est le plus sûr.
 **Pour un SPA + API REST** : localStorage est le plus courant (compromis simplicité/**Sécurité**).
 
-****************Piège**************** : localStorage est vulnérable au XSS (un script malveillant peut lire le token).
+******************Piège****************** : localStorage est vulnérable au XSS (un script malveillant peut lire le token).
 
 ---
 
@@ -1698,7 +1698,7 @@ Enregistrement :
 
 ********typescript********
 { path: 'books', component: BookListComponent, canActivate: [authGuard] }
-**************Piège************** : un guard côté client ne remplace pas la **Sécurité** côté serveur. Le backend doit toujours valider le JWT.
+****************Piège**************** : un guard côté client ne remplace pas la **Sécurité** côté serveur. Le backend doit toujours valider le JWT.
 
 ### Q155. HttpClient — quand utiliser HttpParams vs query string brut ?
 ************R courte************ : HttpParams est typé, immuable, encodé automatiquement.
@@ -1710,7 +1710,7 @@ this.http.get('/api/books', { params });
 
 // ❌ Fragile
 this.http.get('/api/books?page=0&size=20');
-**************Piège************** : HttpParams est immuable — params.set() renvoie une nouvelle instance, ne modifie pas l'originale.
+****************Piège**************** : HttpParams est immuable — params.set() renvoie une nouvelle instance, ne modifie pas l'originale.
 
 ### Q156. Pourquoi @if plutôt que *ngIf en Angular 17+ ?
 ************R courte************ : @if est le control flow intégré, plus performant (compilé, pas de directive) et plus lisible.
@@ -1776,7 +1776,7 @@ logout() {
   // Nettoyage local
   localStorage.clear();
 }
-**************Piège************** : ne pas attendre la réponse (fire-and-forget) — l'utilisateur doit être déconnecté immédiatement côté UI.
+****************Piège**************** : ne pas attendre la réponse (fire-and-forget) — l'utilisateur doit être déconnecté immédiatement côté UI.
 
 ### Q160. Pourquoi tester le flow JWT de bout en bout ?
 ************R courte************ : le flow fait intervenir 5 composants :
@@ -1820,7 +1820,7 @@ Anti-pattern : ne tester que le happy path. Ajouter : token manquant → 401, to
 - `ci.yml` : build + tests sur **chaque push** et PR (backend + frontend)
 - `cd.yml` : build image + push sur GHCR + deploy sur push `main` et tags
 
-****************Piège**************** : CD sans CI = déploiement de code cassé.
+******************Piège****************** : CD sans CI = déploiement de code cassé.
 
 ---
 
@@ -1893,7 +1893,7 @@ Deploy frontend (job 2) → download dist/ → push sur CDN
 
 Durée de rétention : retention-days: 7 (par défaut 90).
 
-**************Piège************** : les artifacts ne traversent pas les workflows. Pour ça, il faut des Releases ou un registry.
+****************Piège**************** : les artifacts ne traversent pas les workflows. Pour ça, il faut des Releases ou un registry.
 
 ### Q167. Différence entre tag Git et tag Docker ?
 **********R courte********** :
@@ -1913,7 +1913,7 @@ yaml
 context: ./backend      # ← seulement le dossier backend est envoyé
 Avantage : réduit la taille du contexte (donc build plus rapide), surtout si le repo contient des gros dossiers (node_modules, .git).
 
-**************Piège************** : si vous oubliez .dockerignore, tout le repo est envoyé (parfois 500 Mo+).
+****************Piège**************** : si vous oubliez .dockerignore, tout le repo est envoyé (parfois 500 Mo+).
 
 ### Q169. Pourquoi utiliser npm ci au lieu de npm install en CI ?
 **********R courte********** : npm ci :
@@ -2056,7 +2056,7 @@ JobExecutionContext : état partagé pendant l'exécution (persisté pour restar
 new JobParametersBuilder()
     .addLong("timestamp", System.currentTimeMillis())
     .toJobParameters();
-************Piège************ : sans timestamp, un 2ᵉ run lève JobInstanceAlreadyExistsException.
+**************Piège************** : sans timestamp, un 2ᵉ run lève JobInstanceAlreadyExistsException.
 
 ********Vécu******** : chaque appel POST /api/batch/import génère un timestamp unique → nouvelle exécution.
 
@@ -2065,7 +2065,7 @@ new JobParametersBuilder()
 
 Autre approche : relancer avec les mêmes JobParameters → Spring Batch détecte l'échec précédent et reprend où il s'était arrêté.
 
-************Piège************ : si on change les paramètres, c'est une nouvelle exécution (pas un restart).
+**************Piège************** : si on change les paramètres, c'est une nouvelle exécution (pas un restart).
 
 ********Vécu******** : après le FAILED du run 1, j'ai créé un run 2 avec de nouveaux paramètres.
 
@@ -2125,7 +2125,7 @@ Vérifier exec.getExitStatus() == ExitStatus.COMPLETED
 
 Vérifier les effets (BDD, fichiers…)
 
-**********Piège********** : utiliser des JobParameters différents à chaque test → sinon JobInstanceAlreadyExistsException.
+************Piège************ : utiliser des JobParameters différents à chaque test → sinon JobInstanceAlreadyExistsException.
 
 ### Q183. @Scheduled vs job scheduler ?
 ******R courte****** :
@@ -2255,7 +2255,7 @@ Alternative moderne : @Scheduled (Spring) suffit pour des cron simples.
 - `never` : ne touche pas (prod, Flyway gère)
 - `embedded` (défaut) : crée si datasource embarquée (H2, HSQLDB)
 
-**********Piège********** : si `never` est hérité de prod et non overridé en test → tables absentes → `BadSqlGrammarException` sur `BATCH_JOB_INSTANCE`.
+************Piège************ : si `never` est hérité de prod et non overridé en test → tables absentes → `BadSqlGrammarException` sur `BATCH_JOB_INSTANCE`.
 
 ---
 
@@ -2298,7 +2298,7 @@ Alternative moderne : @Scheduled (Spring) suffit pour des cron simples.
    - `countBefore + 1` = `countAfter`
    - Contenu de la nouvelle ligne
 
-**********Piège********** : si le job échoue, regarder `execution.getStepExecutions().getFailureExceptions()` pour la vraie cause.
+************Piège************ : si le job échoue, regarder `execution.getStepExecutions().getFailureExceptions()` pour la vraie cause.
 
 ******Vécu****** : le `exit_message` dans `BATCH_STEP_EXECUTION` (visible en prod) indique la cause exacte.
 
@@ -2315,7 +2315,7 @@ Alternative moderne : @Scheduled (Spring) suffit pour des cron simples.
 
 **Choix BookHub** : `localStorage` (API REST + SPA classique).
 
-**********Piège********** : ne jamais stocker de données sensibles (mot de passe, PII) dans le JWT — il est **lisible** par tous.
+************Piège************ : ne jamais stocker de données sensibles (mot de passe, PII) dans le JWT — il est **lisible** par tous.
 
 ******Vécu****** : clés namespacées (`bookhub.token`, `bookhub.refreshToken`, `bookhub.username`) pour éviter les collisions.
 
@@ -2331,7 +2331,7 @@ Alternative moderne : @Scheduled (Spring) suffit pour des cron simples.
 
 **Enregistrement** : `provideHttpClient(withInterceptors([authInterceptor]))`.
 
-**********Piège********** : sans `withInterceptors([...])`, l'interceptor **n'est jamais appelé** — même s'il est bien écrit.
+************Piège************ : sans `withInterceptors([...])`, l'interceptor **n'est jamais appelé** — même s'il est bien écrit.
 
 ---
 
@@ -2355,11 +2355,11 @@ Alternative moderne : @Scheduled (Spring) suffit pour des cron simples.
 const payload = JSON.parse(atob(token.split('.')[1]));
 return payload.exp * 1000 > Date.now();  // exp en secondes, Date.now() en ms
 
-********Piège******** : atob() n'accepte pas les caractères base64url (-, _). Sur certains tokens, convertir :
+**********Piège********** : atob() n'accepte pas les caractères base64url (-, _). Sur certains tokens, convertir :
 
 ******typescript******
 const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-********Piège******** 2 : le payload JWT est public — ne pas y mettre de données sensibles.
+**********Piège********** 2 : le payload JWT est public — ne pas y mettre de données sensibles.
 
 Limite : ceci vérifie juste exp, pas la signature. La signature est validée par le backend. Côté client, on fait confiance au token tant que le backend l'accepte.
 
@@ -2382,9 +2382,9 @@ export const authGuard: CanActivateFn = (route, state) => {
 };
 Enregistrement : { path: 'books', canActivate: [authGuard], component: ... }.
 
-********Piège******** : canActivate est asynchrone-ready — peut retourner boolean | Observable<boolean> | Promise<boolean>.
+**********Piège********** : canActivate est asynchrone-ready — peut retourner boolean | Observable<boolean> | Promise<boolean>.
 
-********Piège******2**  : la garde est côté client uniquement → toujours protéger les endpoints côté backend (@PreAuthorize).
+**********Piège********2**  : la garde est côté client uniquement → toujours protéger les endpoints côté backend (@PreAuthorize).
 
 ---
 
@@ -2398,7 +2398,7 @@ Enregistrement : { path: 'books', canActivate: [authGuard], component: ... }.
 
 **Pattern** : interceptor qui capture les 401, appelle `/refresh`, rejoue la requête initiale.
 
-********Piège******** : sans le refresh, mauvaise UX (déconnexion intempestive) OU token très long (faille sécurité).
+**********Piège********** : sans le refresh, mauvaise UX (déconnexion intempestive) OU token très long (faille sécurité).
 
 ---
 
@@ -2413,7 +2413,7 @@ const isAuthEndpoint = req.url.includes('/api/auth/');
 if (error.status !== 401 || isAuthEndpoint) {
   return throwError(() => error);
 }
-******Piège****** : l'exclusion doit être dans le refresh interceptor, pas dans l'auth interceptor.
+********Piège******** : l'exclusion doit être dans le refresh interceptor, pas dans l'auth interceptor.
 
 ### Q203. Comment gérer plusieurs requêtes concurrentes qui reçoivent 401 ?
 ****R courte**** : un pattern "token refresh queue" avec BehaviorSubject + isRefreshing.
@@ -2457,7 +2457,7 @@ Aller : refresh laisse passer → auth ajoute le token → HTTP
 
 Retour : HTTP → auth vérifie → refresh voit le 401 et rejoue
 
-****Piège**** : si l'ordre est inversé ([auth, refresh]), le refresh ne verra pas le 401 à temps.
+******Piège****** : si l'ordre est inversé ([auth, refresh]), le refresh ne verra pas le 401 à temps.
 
 ### Q205. Le refresh token doit-il être rotaté ?
 ****R courte**** : oui, c'est la recommandation OAuth 2.0.
@@ -2472,7 +2472,7 @@ Limite la fenêtre d'exploitation d'un token volé
 
 Implémentation BookHub (J17) : RefreshTokenService.rotate() fait la rotation côté backend, et l'interceptor stocke le nouveau refresh token à chaque appel.
 
-****Piège**** : si le backend ne retourne pas le nouveau refresh token, le client va se retrouver avec un token révoqué → déconnexion intempestive. Toujours vérifier que la réponse contient refreshToken
+******Piège****** : si le backend ne retourne pas le nouveau refresh token, le client va se retrouver avec un token révoqué → déconnexion intempestive. Toujours vérifier que la réponse contient refreshToken
 
 
 ## Tests Angular (J28)
@@ -2483,7 +2483,7 @@ Implémentation BookHub (J17) : RefreshTokenService.rotate() fait la rotation c�
 
 **BookHub** : Karma + Jasmine (standard Angular).
 
-****Piège**** : depuis Angular 17, **`karma.conf.js` n'est plus généré** par défaut. Il faut le créer manuellement et ajouter `"karmaConfig": "karma.conf.js"` dans `angular.json`.
+******Piège****** : depuis Angular 17, **`karma.conf.js` n'est plus généré** par défaut. Il faut le créer manuellement et ajouter `"karmaConfig": "karma.conf.js"` dans `angular.json`.
 
 ****Vécu**** : Chrome crash en headless → ajout de `customLaunchers` avec flags `--no-sandbox`.
 
@@ -2503,7 +2503,7 @@ const httpMock = TestBed.inject(HttpTestingController);
 // ... après le test :
 httpMock.expectOne('/api/books').flush(fakeData);
 httpMock.verify();  // vérifie qu'aucune requête n'est en attente
-**Piège** : ne pas oublier httpMock.verify() dans afterEach() — sinon les requêtes non résolues passent silencieusement.
+****Piège**** : ne pas oublier httpMock.verify() dans afterEach() — sinon les requêtes non résolues passent silencieusement.
 
 ### Q208. Tester un HttpInterceptorFn ?
 **R courte** : injecter l'interceptor via provideHttpClient(withInterceptors([...])) et provideHttpClientTesting(), puis faire un vrai appel HTTP.
@@ -2535,7 +2535,7 @@ fixture.detectChanges() déclenche ngOnInit
 
 Assertions sur component.xxx ou sur le DOM (fixture.nativeElement)
 
-**Piège** : toujours mocker les dépendances injectées. Si le composant injecte AuthService et qu'il n'est pas mocké → NullInjectorError.
+****Piège**** : toujours mocker les dépendances injectées. Si le composant injecte AuthService et qu'il n'est pas mocké → NullInjectorError.
 
 **Vécu** : AppComponent injecte AuthService → mock avec { provide: AuthService, useValue: { isLoggedIn: () => false, ... } }.
 
@@ -2555,3 +2555,76 @@ onSubmit() {
 Bénéfice : évite un appel API inutile (le backend va rejeter un body vide) et simplifie le test.
 
 **Vécu** (J28) : le test should not submit if fields are empty a détecté ce bug.
+
+---
+
+## Docker + CI/CD (J28)
+
+### Q211. `Dockerfile` multi-stage — pourquoi ?
+
+**R courte** : sépare l'**environnement de build** (Node, Maven, JDK) de l'**environnement d'exécution** (nginx, JRE).
+
+**Bénéfices** :
+- **Taille** : 74 Mo (nginx + assets) vs 600 Mo (Node + node_modules + source)
+- **Sécurité** : pas d'outils de build en prod (npm, compilateurs)
+- **Clarté** : un Dockerfile = 2 environnements
+
+****Piège**** : sans `.dockerignore`, `node_modules/` (500 Mo) est copié dans le contexte → build 10× plus lent.
+
+---
+
+### Q212. `nginx.conf` : pourquoi `try_files $uri $uri/ /index.html` ?
+
+**R courte** : sans ça, une SPA Angular casse au refresh sur une route.
+
+**Sans** : `GET /books` → nginx cherche un fichier `books` → 404
+**Avec** : `GET /books` → nginx renvoie `index.html` → Angular Router prend le relais → OK
+
+**Vécu** : F5 sur `/books` renvoie 404 nginx sans cette ligne.
+
+**Alternative** : HashLocationStrategy (Angular), mais URLs laides (`/#/books`).
+
+---
+
+### Q213. Pourquoi `127.0.0.1` au lieu de `localhost` dans un HEALTHCHECK ?
+
+**R courte** : `localhost` peut résoudre en **IPv6 (`::1`)** selon l'environnement. Si le service écoute en IPv4 only (`0.0.0.0:80`), le healthcheck échoue avec `Connection refused`.
+
+**Fix** : forcer `127.0.0.1` (IPv4 explicite).
+
+**Vécu (J28)** : nginx:alpine écoute en IPv4, busybox `wget http://localhost/` résout `::1` → `Connection refused` → container `unhealthy` alors que le service répond parfaitement de l'extérieur.
+
+**Leçon** : dans les healthchecks Docker, préférer `127.0.0.1` à `localhost`.
+
+---
+
+### Q214. Différence entre CI et CD ?
+
+**R courte** :
+- **CI** (Continuous Integration) : chaque push teste et valide le code
+- **CD** (Continuous Delivery/Deployment) : chaque push **déploie** (automatiquement)
+
+**BookHub** :
+- **CI** : tests backend + frontend sur chaque push et PR
+- **CD partiel** : push d'images Docker sur `ghcr.io` à chaque push `main`
+
+**Pas encore** : déploiement automatique sur un cloud (Fly.io, Railway) — prévu plus tard.
+
+****Piège**** : `if: github.ref == 'refs/heads/main'` sur les jobs CD → ils ne tournent pas sur les PR (économie de minutes + pas de push d'image de branche).
+
+---
+
+### Q215. `permissions: packages: write` dans GitHub Actions ?
+
+**R courte** : GitHub Actions a un `GITHUB_TOKEN` auto-fourni avec des permissions **lecture seule** par défaut. Pour **pousser** une image sur `ghcr.io`, il faut demander explicitement `packages: write`.
+
+yaml
+permissions:
+  contents: read
+  packages: write
+  
+  **Piège** : sans ça → Error: denied: permission_denied: write_package
+
+Bonne pratique : mettre permissions au niveau du job (pas du workflow) pour limiter le scope.
+
+Alternative : Personal Access Token (PAT) dans secrets, mais moins sûr que GITHUB_TOKEN.
