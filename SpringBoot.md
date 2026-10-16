@@ -1,7 +1,7 @@
 # Spring Boot - Questions d'Interview
 
 > **Nombre de questions :** 50
-> **Généré le :** 2026-10-16 16:29:29
+> **Généré le :** 2026-10-16 14:38:36
 
 ---
 
@@ -25,6 +25,7 @@
 ### 1. Qu'est-ce que Spring Boot et en quoi diffère-t-il du Spring Framework ?
 
 **Réponse :**
+
 Spring Boot est une extension du Spring Framework qui simplifie la configuration et le développement d'applications Spring. Il fournit des configurations par défaut et un serveur embarqué pour réduire le temps de configuration.
 
 **Différences principales :**
@@ -37,6 +38,7 @@ Spring Boot est une extension du Spring Framework qui simplifie la configuration
 ### 2. Quels sont les avantages de Spring Boot ?
 
 **Réponse :**
+
 - **Développement rapide** : Configuration minimale requise
 - **Auto-configuration** : Configuration automatique basée sur les dépendances
 - **Serveur embarqué** : Pas besoin de déployer sur un serveur externe
@@ -49,6 +51,7 @@ Spring Boot est une extension du Spring Framework qui simplifie la configuration
 ### 3. Comment créer une application Spring Boot ?
 
 **Réponse :**
+
 ```java
 @SpringBootApplication
 public class MyApplication {
@@ -56,16 +59,17 @@ public class MyApplication {
         SpringApplication.run(MyApplication.class, args);
     }
 }
-Étapes :
+```
 
-Utiliser Spring Initializr (start.spring.io)
+**Étapes :**
+1. Utiliser Spring Initializr (start.spring.io)
+2. Ou ajouter les dépendances dans `pom.xml` / `build.gradle`
+3. Créer la classe principale avec `@SpringBootApplication`
 
-Ou ajouter les dépendances dans pom.xml/build.gradle
+### 4. Qu'est-ce qu'un Spring Boot Starter ?
 
-Créer la classe principale avec @SpringBootApplication
+**Réponse :**
 
-4. Qu'est-ce qu'un Spring Boot Starter ?
-Réponse :
 Un Starter est un ensemble de descripteurs de dépendances qui simplifie la configuration Maven/Gradle. Il regroupe toutes les dépendances nécessaires pour une fonctionnalité spécifique.
 
 Exemples :
@@ -78,8 +82,10 @@ spring-boot-starter-security : Pour Spring Security
 
 spring-boot-starter-test : Pour les tests (JUnit, Mockito, AssertJ)
 
-5. Expliquez le concept d'auto-configuration dans Spring Boot
-Réponse :
+### 5. Expliquez le concept d'auto-configuration dans Spring Boot
+
+**Réponse :**
+
 L'auto-configuration configure automatiquement l'application Spring en fonction des dépendances présentes dans le classpath.
 
 Fonctionnement :
@@ -92,18 +98,24 @@ Les classes @ConditionalOnClass, @ConditionalOnMissingBean contrôlent l'activat
 
 Exemple : Si H2 est dans le classpath, Spring Boot configure automatiquement une base de données en mémoire.
 
-6. Comment définir des propriétés dans une application Spring Boot ?
-Réponse :
+### 6. Comment définir des propriétés dans une application Spring Boot ?
+
+**Réponse :**
+
 Dans application.properties ou application.yml :
 
-properties
+```properties
 server.port=8080
 spring.datasource.url=jdbc:mysql://localhost:3306/mydb
 spring.datasource.username=root
 spring.datasource.password=password
 spring.jpa.hibernate.ddl-auto=update
-7. Qu'est-ce qu'un profil dans Spring Boot et comment l'utiliser ?
-Réponse :
+```
+
+### 7. Qu'est-ce qu'un profil dans Spring Boot et comment l'utiliser ?
+
+**Réponse :**
+
 Un profil permet de séparer les configurations selon l'environnement (dev, test, prod).
 
 Utilisation :
@@ -114,17 +126,21 @@ Fichiers application-dev.properties, application-prod.properties
 
 Activation : --spring.profiles.active=dev
 
-java
+```java
 @Component
 @Profile("dev")
 public class DevDataSourceConfig {
     // Configuration spécifique au développement
 }
-8. Comment implémenter la gestion des exceptions dans Spring Boot ?
-Réponse :
+```
+
+### 8. Comment implémenter la gestion des exceptions dans Spring Boot ?
+
+**Réponse :**
+
 Utiliser @ControllerAdvice et @ExceptionHandler :
 
-java
+```java
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -136,8 +152,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-9. Qu'est-ce que l'annotation @SpringBootApplication ?
-Réponse :
+```
+
+### 9. Qu'est-ce que l'annotation @SpringBootApplication ?
+
+**Réponse :**
+
 @SpringBootApplication combine trois annotations :
 
 @Configuration : Indique une classe de configuration
@@ -146,47 +166,62 @@ Réponse :
 
 @ComponentScan : Scanne les composants dans le package courant
 
-10. Quelle est la différence entre application.properties et bootstrap.properties ?
-Réponse :
+### 10. Quelle est la différence entre application.properties et bootstrap.properties ?
+
+**Réponse :**
 
 bootstrap.properties : Chargé en premier, utilisé pour Spring Cloud Config (connexion au serveur de configuration)
 
 application.properties : Configuration principale de l'application
 
-2. Configuration et Dépendances
-11. Comment configurer un DataSource dans Spring Boot ?
-Réponse :
+## 2. Configuration et Dépendances
 
-properties
+### 11. Comment configurer un DataSource dans Spring Boot ?
+
+**Réponse :**
+
+```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/mydb
 spring.datasource.username=root
 spring.datasource.password=password
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.datasource.hikari.maximum-pool-size=10
 spring.datasource.hikari.minimum-idle=5
-12. Comment activer HTTPS dans Spring Boot ?
-Réponse :
+```
 
-properties
+### 12. Comment activer HTTPS dans Spring Boot ?
+
+**Réponse :**
+
+```properties
 server.port=8443
 server.ssl.key-store=classpath:keystore.p12
 server.ssl.key-store-password=changeit
 server.ssl.keyStoreType=PKCS12
 server.ssl.keyAlias=tomcat
-13. Comment configurer le logging dans Spring Boot ?
-Réponse :
+```
 
-properties
+### 13. Comment configurer le logging dans Spring Boot ?
+
+**Réponse :**
+
+```properties
 logging.level.org.springframework=DEBUG
 logging.level.com.example=INFO
 logging.file.name=app.log
 logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
-14. Qu'est-ce que @EnableAutoConfiguration ?
-Réponse :
+```
+
+### 14. Qu'est-ce que @EnableAutoConfiguration ?
+
+**Réponse :**
+
 @EnableAutoConfiguration indique à Spring Boot de configurer automatiquement les beans en fonction des dépendances du classpath et des propriétés définies.
 
-15. Comment externaliser la configuration dans Spring Boot ?
-Réponse :
+### 15. Comment externaliser la configuration dans Spring Boot ?
+
+**Réponse :**
+
 Ordre de priorité (du plus élevé au plus bas) :
 
 Arguments de ligne de commande
@@ -199,11 +234,13 @@ application.properties
 
 @PropertySource
 
-16. Qu'est-ce que CommandLineRunner ?
-Réponse :
+### 16. Qu'est-ce que CommandLineRunner ?
+
+**Réponse :**
+
 Interface pour exécuter du code après le démarrage de l'application.
 
-java
+```java
 @Component
 public class MyRunner implements CommandLineRunner {
     @Override
@@ -211,10 +248,13 @@ public class MyRunner implements CommandLineRunner {
         System.out.println("Application started!");
     }
 }
-17. Comment configurer plusieurs DataSources ?
-Réponse :
+```
 
-java
+### 17. Comment configurer plusieurs DataSources ?
+
+**Réponse :**
+
+```java
 @Configuration
 public class DataSourceConfig {
     @Bean(name = "primaryDataSource")
@@ -229,11 +269,15 @@ public class DataSourceConfig {
         return DataSourceBuilder.create().build();
     }
 }
-18. Qu'est-ce que @ConfigurationProperties ?
-Réponse :
+```
+
+### 18. Qu'est-ce que @ConfigurationProperties ?
+
+**Réponse :**
+
 Permet de binder des propriétés à un objet Java de façon type-safe.
 
-java
+```java
 @Component
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
@@ -244,17 +288,21 @@ public class AppProperties {
 properties
 app.name=MyApp
 app.version=1.0.0
-19. Quelle est la différence entre @Value et @ConfigurationProperties ?
-Réponse :
+```
+
+### 19. Quelle est la différence entre @Value et @ConfigurationProperties ?
+
+**Réponse :**
 
 @Value : Injection de valeurs individuelles, pas de validation
 
 @ConfigurationProperties : Binding de groupes de propriétés, support de la validation, type-safe
 
-20. Comment utiliser @ConditionalOnProperty ?
-Réponse :
+### 20. Comment utiliser @ConditionalOnProperty ?
 
-java
+**Réponse :**
+
+```java
 @Configuration
 @ConditionalOnProperty(
     name = "feature.cache.enabled",
@@ -264,9 +312,14 @@ java
 public class CacheConfig {
     // Configuration activée uniquement si la propriété est true
 }
-3. Dependency Injection et Beans
-21. Qu'est-ce que la Dependency Injection dans Spring Boot ?
-Réponse :
+```
+
+## 3. Dependency Injection et Beans
+
+### 21. Qu'est-ce que la Dependency Injection dans Spring Boot ?
+
+**Réponse :**
+
 Design pattern où les dépendances d'un objet sont fournies par le conteneur Spring plutôt que créées par l'objet lui-même.
 
 Types :
@@ -277,7 +330,7 @@ Setter Injection
 
 Field Injection (déconseillé)
 
-java
+```java
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -286,8 +339,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 }
-22. Qu'est-ce qu'un Spring Bean ?
-Réponse :
+```
+
+### 22. Qu'est-ce qu'un Spring Bean ?
+
+**Réponse :**
+
 Un Bean est un objet géré par le conteneur Spring IoC. Il est instancié, assemblé et géré par Spring.
 
 Définition :
@@ -302,8 +359,9 @@ Définition :
 
 @Bean : Dans une classe @Configuration
 
-23. Quelle est la différence entre @Component, @Service, @Repository et @Controller ?
-Réponse :
+### 23. Quelle est la différence entre @Component, @Service, @Repository et @Controller ?
+
+**Réponse :**
 
 @Component : Stéréotype générique pour tout composant Spring
 
@@ -313,14 +371,15 @@ Réponse :
 
 @Controller : Spécialisation pour les contrôleurs MVC
 
-24. Expliquez la différence entre @Primary et @Qualifier
-Réponse :
+### 24. Expliquez la différence entre @Primary et @Qualifier
+
+**Réponse :**
 
 @Primary : Définit le bean par défaut quand plusieurs candidats existent
 
 @Qualifier : Spécifie explicitement quel bean injecter
 
-java
+```java
 @Bean
 @Primary
 public MessageService emailService() {
@@ -333,10 +392,13 @@ public MessageService smsService() {
 @Autowired
 @Qualifier("smsService")
 private MessageService messageService;
-25. Comment définir un Bean avec @Bean ?
-Réponse :
+```
 
-java
+### 25. Comment définir un Bean avec @Bean ?
+
+**Réponse :**
+
+```java
 @Configuration
 public class AppConfig {
     @Bean
@@ -348,8 +410,11 @@ public class AppConfig {
         return new ObjectMapper();
     }
 }
-26. Quels sont les scopes de Bean dans Spring ?
-Réponse :
+```
+
+### 26. Quels sont les scopes de Bean dans Spring ?
+
+**Réponse :**
 
 singleton : Une instance par conteneur (défaut)
 
@@ -361,17 +426,21 @@ session : Une instance par session HTTP
 
 application : Une instance par ServletContext
 
-27. Comment créer une annotation personnalisée ?
-Réponse :
+### 27. Comment créer une annotation personnalisée ?
 
-java
+**Réponse :**
+
+```java
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LogExecutionTime {
     String value() default "";
 }
-28. Qu'est-ce que le cycle de vie d'un Bean Spring ?
-Réponse :
+```
+
+### 28. Qu'est-ce que le cycle de vie d'un Bean Spring ?
+
+**Réponse :**
 
 Instanciation
 
@@ -387,17 +456,21 @@ Utilisation
 
 @PreDestroy / destroy()
 
-29. Comment utiliser @Lookup ?
-Réponse :
+### 29. Comment utiliser @Lookup ?
 
-java
+**Réponse :**
+
+```java
 @Component
 public abstract class CommandManager {
     @Lookup
     protected abstract Command createCommand();
 }
-30. Quelle est la différence entre @Resource, @Inject et @Autowired ?
-Réponse :
+```
+
+### 30. Quelle est la différence entre @Resource, @Inject et @Autowired ?
+
+**Réponse :**
 
 @Autowired : Spécifique Spring, injection par type puis par nom
 
@@ -405,11 +478,13 @@ Réponse :
 
 @Inject : JSR-330, standard Java, similaire à @Autowired
 
-4. REST et Web Development
-31. Comment créer un service RESTful dans Spring Boot ?
-Réponse :
+## 4. REST et Web Development
 
-java
+### 31. Comment créer un service RESTful dans Spring Boot ?
+
+**Réponse :**
+
+```java
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -434,8 +509,11 @@ public class UserController {
             .body(userService.save(user));
     }
 }
-32. Quelle est la différence entre @RequestBody et @ResponseBody ?
-Réponse :
+```
+
+### 32. Quelle est la différence entre @RequestBody et @ResponseBody ?
+
+**Réponse :**
 
 @RequestBody : Lie le corps de la requête HTTP à un paramètre de méthode
 
@@ -443,10 +521,11 @@ Réponse :
 
 Avec @RestController, @ResponseBody est implicite.
 
-33. Comment valider une requête dans Spring Boot ?
-Réponse :
+### 33. Comment valider une requête dans Spring Boot ?
 
-java
+**Réponse :**
+
+```java
 @PostMapping("/users")
 public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
     return ResponseEntity.ok(userService.save(user));
@@ -461,23 +540,29 @@ public class User {
     @Min(18)
     private int age;
 }
-34. Quelle est la différence entre @PathVariable et @RequestParam ?
-Réponse :
+```
+
+### 34. Quelle est la différence entre @PathVariable et @RequestParam ?
+
+**Réponse :**
 
 @PathVariable : Extrait les valeurs du chemin URI
 
 @RequestParam : Extrait les paramètres de requête
 
-java
+```java
 @GetMapping("/users/{id}")
 public User getUser(@PathVariable Long id) { }
 
 @GetMapping("/search")
 public List<User> search(@RequestParam String name) { }
-35. Comment implémenter la pagination dans Spring Boot ?
-Réponse :
+```
 
-java
+### 35. Comment implémenter la pagination dans Spring Boot ?
+
+**Réponse :**
+
+```java
 @GetMapping("/users")
 public Page<User> getUsers(
     @RequestParam(defaultValue = "0") int page,
@@ -486,10 +571,13 @@ public Page<User> getUsers(
     Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
     return userRepository.findAll(pageable);
 }
-36. Comment gérer CORS dans Spring Boot ?
-Réponse :
+```
 
-java
+### 36. Comment gérer CORS dans Spring Boot ?
+
+**Réponse :**
+
+```java
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
     @Override
@@ -501,15 +589,19 @@ public class CorsConfig implements WebMvcConfigurer {
             .allowCredentials(true);
     }
 }
-37. Quelle est la différence entre POST et PUT ?
-Réponse :
+```
+
+### 37. Quelle est la différence entre POST et PUT ?
+
+**Réponse :**
 
 POST : Crée une nouvelle ressource, non idempotent
 
 PUT : Met à jour ou crée une ressource, idempotent
 
-38. Quels sont les codes de statut HTTP courants ?
-Réponse :
+### 38. Quels sont les codes de statut HTTP courants ?
+
+**Réponse :**
 
 200 OK : Succès
 
@@ -527,10 +619,11 @@ Réponse :
 
 500 Internal Server Error : Erreur serveur
 
-39. Comment implémenter HATEOAS ?
-Réponse :
+### 39. Comment implémenter HATEOAS ?
 
-java
+**Réponse :**
+
+```java
 @GetMapping("/users/{id}")
 public EntityModel<User> getUser(@PathVariable Long id) {
     User user = userService.findById(id);
@@ -538,10 +631,13 @@ public EntityModel<User> getUser(@PathVariable Long id) {
     resource.add(linkTo(methodOn(UserController.class).getUser(id)).withSelfRel());
     return resource;
 }
-40. Comment créer un filtre personnalisé ?
-Réponse :
+```
 
-java
+### 40. Comment créer un filtre personnalisé ?
+
+**Réponse :**
+
+```java
 @Component
 public class LoggingFilter implements Filter {
     @Override
@@ -553,12 +649,17 @@ public class LoggingFilter implements Filter {
         System.out.println("Request took: " + duration + "ms");
     }
 }
-5. Spring Data et JPA
-41. Qu'est-ce que Spring Data JPA ?
-Réponse :
+```
+
+## 5. Spring Data et JPA
+
+### 41. Qu'est-ce que Spring Data JPA ?
+
+**Réponse :**
+
 Spring Data JPA simplifie l'implémentation de la couche d'accès aux données en fournissant des repositories basés sur JPA.
 
-java
+```java
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
@@ -566,8 +667,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.department = :dept")
     List<User> findByDepartment(@Param("dept") String department);
 }
-42. Quelle est la différence entre CrudRepository, JpaRepository et PagingAndSortingRepository ?
-Réponse :
+```
+
+### 42. Quelle est la différence entre CrudRepository, JpaRepository et PagingAndSortingRepository ?
+
+**Réponse :**
 
 CrudRepository : Opérations CRUD de base
 
@@ -575,10 +679,11 @@ PagingAndSortingRepository : Étend CrudRepository avec pagination et tri
 
 JpaRepository : Étend PagingAndSortingRepository avec des méthodes JPA spécifiques
 
-43. Comment définir une requête personnalisée ?
-Réponse :
+### 43. Comment définir une requête personnalisée ?
 
-java
+**Réponse :**
+
+```java
 // JPQL
 @Query("SELECT u FROM User u WHERE u.email = ?1")
 User findByEmail(String email);
@@ -589,10 +694,13 @@ User findByEmailNative(String email);
 
 // Query By Method Name
 List<User> findByLastNameAndFirstName(String lastName, String firstName);
-44. Comment gérer les transactions dans Spring Boot ?
-Réponse :
+```
 
-java
+### 44. Comment gérer les transactions dans Spring Boot ?
+
+**Réponse :**
+
+```java
 @Service
 public class UserService {
     @Transactional
@@ -604,13 +712,17 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 }
-45. Qu'est-ce que le problème N+1 et comment le résoudre ?
-Réponse :
+```
+
+### 45. Qu'est-ce que le problème N+1 et comment le résoudre ?
+
+**Réponse :**
+
 Le problème N+1 se produit quand une requête charge une entité, puis N requêtes supplémentaires chargent les entités liées.
 
 Solutions :
 
-java
+```java
 // JOIN FETCH
 @Query("SELECT u FROM User u JOIN FETCH u.orders WHERE u.id = :id")
 User findUserWithOrders(@Param("id") Long id);
@@ -618,10 +730,13 @@ User findUserWithOrders(@Param("id") Long id);
 // EntityGraph
 @EntityGraph(attributePaths = {"orders"})
 User findWithOrdersById(Long id);
-46. Qu'est-ce que @Entity et @Table ?
-Réponse :
+```
 
-java
+### 46. Qu'est-ce que @Entity et @Table ?
+
+**Réponse :**
+
+```java
 @Entity
 @Table(name = "users", schema = "public")
 public class User {
@@ -633,8 +748,11 @@ public class User {
     @Transient
     private String temporaryField;
 }
-47. Quels sont les types de relations JPA ?
-Réponse :
+```
+
+### 47. Quels sont les types de relations JPA ?
+
+**Réponse :**
 
 @OneToOne
 
@@ -644,7 +762,7 @@ Réponse :
 
 @ManyToMany
 
-java
+```java
 @Entity
 public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
@@ -653,29 +771,39 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;
 }
-48. Qu'est-ce que FetchType.LAZY vs EAGER ?
-Réponse :
+```
+
+### 48. Qu'est-ce que FetchType.LAZY vs EAGER ?
+
+**Réponse :**
 
 LAZY : Charge l'entité liée uniquement quand elle est accédée
 
 EAGER : Charge l'entité liée immédiatement
 
-java
+```java
 @ManyToOne(fetch = FetchType.LAZY)  // Recommandé
 private Customer customer;
-49. Comment utiliser @Modifying et @Query ?
-Réponse :
+```
 
-java
+### 49. Comment utiliser @Modifying et @Query ?
+
+**Réponse :**
+
+```java
 @Modifying
 @Transactional
 @Query("UPDATE User u SET u.active = false WHERE u.lastLogin < :date")
 int deactivateInactiveUsers(@Param("date") LocalDate date);
-50. Qu'est-ce qu'un Projection dans Spring Data JPA ?
-Réponse :
+```
+
+### 50. Qu'est-ce qu'un Projection dans Spring Data JPA ?
+
+**Réponse :**
+
 Interface pour récupérer un sous-ensemble de propriétés.
 
-java
+```java
 public interface UserSummary {
     String getName();
     String getEmail();
@@ -683,4 +811,4 @@ public interface UserSummary {
 
 @Query("SELECT u.name as name, u.email as email FROM User u")
 List<UserSummary> findAllSummaries();
-Fin du fichier SpringBoot.md
+```
